@@ -1,0 +1,35 @@
+{
+  "name": "aurapure-nutrition-monorepo",
+  "version": "1.0.0",
+  "description": "Production D2C E-Commerce Platform for AuraPure Nutrition built on MERN Stack",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend-customer",
+    "frontend-admin"
+  ],
+  "scripts": {
+    "dev:backend": "npm --workspace=backend run dev",
+    "dev:customer": "npm --workspace=frontend-customer run dev",
+    "dev:admin": "npm --workspace=frontend-admin run dev",
+    "build:backend": "npm --workspace=backend run build",
+    "build:customer": "npm --workspace=frontend-customer run build",
+    "build:admin": "npm --workspace=frontend-admin run build",
+    "test": "npm --workspace=backend run test"
+  },
+  "keywords": [
+    "mern",
+    "ecommerce",
+    "react",
+    "nodejs",
+    "express",
+    "mongodb",
+    "d2c",
+    "aurapure",
+    "razorpay",
+    "shiprocket",
+    "whatsapp"
+  ],
+  "author": "AuraPure Engineering Team",
+  "license": "UNLICENSED"
+}

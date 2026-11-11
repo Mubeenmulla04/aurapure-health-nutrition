@@ -1,0 +1,82 @@
+services:
+  # MongoDB Database with Replica Set support
+  mongodb:
+    image: mongo:7.0
+    container_name: aurapure-mongodb
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: aurapure_ecommerce
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - aurapure_network
+
+  # Node.js & Express Application Backend
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: aurapure-backend
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGODB_URI: mongodb://mongodb:27017/aurapure_ecommerce
+    env_file:
+      - .env
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongodb
+    networks:
+      - aurapure_network
+
+  # Customer Facing React Storefront
+  customer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.customer
+    container_name: aurapure-customer
+    restart: always
+    depends_on:
+      - backend
+    networks:
+      - aurapure_network
+
+  # Admin Dashboard Portal
+  admin:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.admin
+    container_name: aurapure-admin
+    restart: always
+    depends_on:
+      - backend
+    networks:
+      - aurapure_network
+
+  # Edge Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: aurapure-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+      - customer
+      - admin
+    networks:
+      - aurapure_network
+
+volumes:
+  mongo_data:
+
+networks:
+  aurapure_network:
+    driver: bridge

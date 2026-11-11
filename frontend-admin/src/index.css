@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #F8FAFC;
+    color: #1E293B;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+}
+
+@layer components {
+  .admin-card {
+    @apply bg-white rounded-xl border border-admin-border p-5 shadow-sm;
+  }
+
+  .admin-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-admin-primary text-white text-sm font-medium hover:bg-opacity-90 transition-colors shadow-sm;
+  }
+
+  .admin-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white border border-admin-border text-admin-dark text-sm font-medium hover:bg-slate-50 transition-colors;
+  }
+
+  .admin-table-th {
+    @apply px-4 py-3 text-left text-xs font-semibold text-admin-muted uppercase tracking-wider bg-slate-50 border-b border-admin-border;
+  }
+
+  .admin-table-td {
+    @apply px-4 py-3 text-sm text-admin-dark border-b border-admin-border;
+  }
+}

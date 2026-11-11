@@ -1,0 +1,16 @@
+# Storefront Customer Frontend Dockerfile
+FROM node:22-alpine AS builder
+
+WORKDIR /app
+COPY package*.json ./
+COPY frontend-customer/package*.json ./frontend-customer/
+
+RUN npm install --workspace=frontend-customer
+
+COPY frontend-customer/ ./frontend-customer/
+RUN npm --workspace=frontend-customer run build
+
+FROM nginx:alpine
+COPY --from=builder /app/frontend-customer/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
