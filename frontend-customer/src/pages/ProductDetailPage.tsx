@@ -51,6 +51,8 @@ export const ProductDetailPage: React.FC = () => {
 
   const [bundleTier, setBundleTier] = useState<'single' | 'duo' | 'trio'>('single');
   const [showStickyBar, setShowStickyBar] = useState(false);
+  const [notFound, setNotFound] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -68,8 +70,10 @@ export const ProductDetailPage: React.FC = () => {
     window.scrollTo(0, 0);
     const fetchProduct = async () => {
       try {
+        setIsLoading(true);
+        setNotFound(false);
         const res = await api.get(`/products/${slug}`);
-        if (res.data?.data) {
+        if (res.data?.data?.product) {
           const prod = res.data.data.product;
           setProduct(prod);
           setRelatedProducts(res.data.data.relatedProducts || []);
@@ -83,16 +87,41 @@ export const ProductDetailPage: React.FC = () => {
             setReviews(revRes.data.data.reviews || []);
             setReviewStats(revRes.data.data);
           }
+        } else {
+          setNotFound(true);
         }
       } catch (err) {
         console.error('Error fetching product details:', err);
+        setNotFound(true);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchProduct();
   }, [slug]);
 
-  if (!product || !selectedVariant) {
+  if (notFound) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-24 text-center space-y-6">
+        <span className="text-xs font-bold uppercase tracking-widest text-brand-primary">Catalog Update</span>
+        <h1 className="font-serif text-3xl sm:text-4xl font-bold text-brand-dark">Product Not Found</h1>
+        <p className="text-sm text-brand-subtext max-w-md mx-auto">
+          The wellness formula you are looking for may have been archived or updated.
+        </p>
+        <div className="flex justify-center gap-4 pt-2">
+          <Link to="/collections" className="btn-primary !text-xs !py-3">
+            Browse All Formulations
+          </Link>
+          <Link to="/" className="btn-secondary !text-xs !py-3">
+            Return Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (isLoading || !product || !selectedVariant) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <div className="w-8 h-8 rounded-full border-2 border-brand-primary border-t-transparent animate-spin" />

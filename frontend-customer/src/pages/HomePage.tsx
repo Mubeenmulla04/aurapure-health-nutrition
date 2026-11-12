@@ -321,7 +321,7 @@ export const HomePage: React.FC = () => {
 
               <div className="flex flex-wrap items-center gap-4 pt-2">
                 <Link
-                  to="/products/organic-plant-protein-powder-chocolate"
+                  to="/products/plant-protein-belgian-dark-chocolate"
                   className="inline-flex items-center justify-center px-8 py-4 rounded-full bg-brand-gold text-brand-dark font-bold text-sm tracking-wide transition-all hover:bg-amber-400 shadow-lg gap-2"
                 >
                   <Gift className="w-4 h-4" />
@@ -469,6 +469,7 @@ export const HomePage: React.FC = () => {
                 className="rounded-2xl border border-brand-muted/70 bg-white overflow-hidden transition-all duration-200"
               >
                 <button
+                  type="button"
                   onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
                   className="w-full p-5 text-left flex items-center justify-between gap-4 font-semibold text-brand-dark text-sm sm:text-base hover:text-brand-primary"
                 >

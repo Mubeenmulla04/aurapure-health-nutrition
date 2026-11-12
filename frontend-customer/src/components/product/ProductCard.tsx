@@ -68,6 +68,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
           {/* Wishlist Button */}
           <button
+            type="button"
             onClick={handleWishlistToggle}
             className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md transition-all ${
               isWishlisted
@@ -102,9 +103,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <div className="flex flex-wrap gap-1.5 mt-3">
             {product.variants.map((v, idx) => (
               <button
+                type="button"
                 key={v._id}
                 onClick={(e) => {
                   e.preventDefault();
+                  e.stopPropagation();
                   setSelectedVariantIndex(idx);
                 }}
                 className={`text-[10px] font-medium px-2 py-0.5 rounded-full border transition-all ${
@@ -135,6 +138,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
         <button
+          type="button"
           onClick={handleQuickAdd}
           disabled={isAdding || !selectedVariant?.inStock}
           className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all ${

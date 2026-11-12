@@ -101,3 +101,106 @@ export const PrivacyPolicyPage: React.FC = () => (
     </p>
   </div>
 );
+
+export const TermsPage: React.FC = () => (
+  <div className="max-w-3xl mx-auto px-4 py-16 space-y-6 text-sm text-brand-subtext leading-relaxed">
+    <h1 className="font-serif text-3xl font-bold text-brand-dark">Terms & Conditions of Service</h1>
+    <p>
+      Welcome to AuraPure Nutrition. By accessing our website, placing an order, or utilizing our services, you agree to be bound by these Terms of Service and all applicable Indian commercial laws.
+    </p>
+    <h3 className="font-serif text-lg font-bold text-brand-dark pt-2">Pricing & Taxation</h3>
+    <p>
+      All retail prices listed on our platform are quoted in Indian Rupees (INR) and are inclusive of statutory 18% Goods & Services Tax (GST). We reserve the right to revise catalog pricing and promotional discounts at any time without prior notice.
+    </p>
+    <h3 className="font-serif text-lg font-bold text-brand-dark pt-2">Orders & Cancellations</h3>
+    <p>
+      Orders may be cancelled before shipment dispatch directly via the Customer Account portal or by emailing support@aurapure.in. Once an air courier AWB tracking number has been generated, orders cannot be cancelled in transit.
+    </p>
+  </div>
+);
+
+export const FaqsPage: React.FC = () => {
+  const [openIdx, setOpenIdx] = React.useState<number | null>(0);
+  const faqList = [
+    {
+      q: 'What makes AuraPure plant protein superior to whey protein?',
+      a: 'Unlike whey, which often triggers lactose intolerance, acne, and heavy bloating, AuraPure is 100% plant-based, made from cold-pressed golden pea and brown rice isolates. We add papain and bromelain digestive enzymes to ensure gentle, effortless digestion and 98% bioavailability without feeling heavy.'
+    },
+    {
+      q: 'Are your products tested for heavy metals and toxins?',
+      a: 'Yes, every single batch is independently tested in NABL-accredited third-party laboratories for Lead, Cadmium, Arsenic, and Mercury, exceeding stringent FSSAI safety norms. Batch COA (Certificate of Analysis) reports are publicly accessible.'
+    },
+    {
+      q: 'How long does shipping take across India?',
+      a: 'Orders placed before 2 PM IST are dispatched on the same business day via Shiprocket premium air couriers (BlueDart, Delhivery, DTDC). Metro deliveries arrive in 2–3 business days; other regions within 4–5 business days.'
+    },
+    {
+      q: 'What payment methods do you accept?',
+      a: 'We partner with Razorpay to provide secure 256-bit encrypted checkout. We accept UPI (Google Pay, PhonePe, Paytm, Cred), all Major Credit & Debit Cards (Visa, Mastercard, RuPay, Amex), and Cash on Delivery (COD) across 18,000+ PIN codes.'
+    },
+    {
+      q: 'What is your refund policy if the taste does not suit me?',
+      a: 'We offer a 14-Day Bloat-Free Taste Guarantee. If you experience any bloating or dissatisfaction with your first tub, contact our customer desk within 14 days of delivery for a hassle-free resolution.'
+    }
+  ];
+
+  return (
+    <div className="max-w-4xl mx-auto px-4 py-16 space-y-10">
+      <div className="text-center space-y-2">
+        <span className="text-xs font-bold uppercase tracking-widest text-brand-primary">Support & Answers</span>
+        <h1 className="font-serif text-3xl sm:text-4xl font-bold text-brand-dark">Frequently Asked Questions</h1>
+        <p className="text-sm text-brand-subtext">Everything you need to know about our formulations, sourcing, and delivery.</p>
+      </div>
+
+      <div className="space-y-3">
+        {faqList.map((item, idx) => {
+          const isOpen = openIdx === idx;
+          return (
+            <div
+              key={idx}
+              className="rounded-2xl border border-brand-muted/70 bg-white overflow-hidden transition-all duration-200"
+            >
+              <button
+                type="button"
+                onClick={() => setOpenIdx(isOpen ? null : idx)}
+                className="w-full p-5 text-left flex items-center justify-between gap-4 font-semibold text-brand-dark text-sm sm:text-base hover:text-brand-primary"
+              >
+                <span>{item.q}</span>
+                <span className="text-brand-primary font-bold text-lg">{isOpen ? '−' : '+'}</span>
+              </button>
+              {isOpen && (
+                <div className="px-5 pb-5 pt-1 text-sm text-brand-subtext leading-relaxed border-t border-brand-muted/40">
+                  {item.a}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+export const NotFoundPage: React.FC = () => (
+  <div className="max-w-2xl mx-auto px-4 py-24 text-center space-y-6">
+    <span className="text-xs font-bold uppercase tracking-widest text-brand-primary">Page Not Found</span>
+    <h1 className="font-serif text-4xl sm:text-5xl font-bold text-brand-dark">404 — Page Unavailable</h1>
+    <p className="text-sm sm:text-base text-brand-subtext max-w-md mx-auto">
+      The page or collection you are looking for may have been moved, renamed, or is temporarily unavailable.
+    </p>
+    <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+      <a
+        href="/"
+        className="inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-brand-primary text-white font-medium text-sm hover:bg-brand-primary-hover shadow-subtle"
+      >
+        Back to Homepage
+      </a>
+      <a
+        href="/collections"
+        className="inline-flex items-center justify-center px-6 py-3.5 rounded-full bg-brand-secondary text-brand-dark font-medium text-sm hover:bg-brand-muted border border-brand-muted/70"
+      >
+        Browse Collections
+      </a>
+    </div>
+  </div>
+);
