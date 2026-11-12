@@ -21,8 +21,12 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/aurapu
 
 export async function seedDatabase() {
   try {
-    await mongoose.connect(MONGODB_URI);
-    logger.info('Connected to MongoDB for database seeding.');
+    if (mongoose.connection.readyState !== 1) {
+      await mongoose.connect(MONGODB_URI);
+      logger.info('Connected to MongoDB for database seeding.');
+    } else {
+      logger.info('Reusing active MongoDB connection for seeding.');
+    }
 
     // Clean existing records if any
     await Role.deleteMany({});
@@ -493,8 +497,8 @@ export async function seedDatabase() {
       {
         title: 'Enjoy Free Express Shipping Across India',
         subtitle: 'On all orders above ₹999. Fast dispatch within 24 hours.',
-        imageDesktop: '',
-        imageMobile: '',
+        imageDesktop: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1200&q=80',
+        imageMobile: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=600&q=80',
         placement: 'PROMO_BAR',
         isActive: true,
         sortOrder: 1,

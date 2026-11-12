@@ -15,6 +15,10 @@ import {
   ChevronRight,
   Send,
   X,
+  Gift,
+  BadgePercent,
+  Check,
+  Banknote,
 } from 'lucide-react';
 import { api } from '../services/api';
 import { Product, ProductVariant, Review } from '../types';
@@ -44,6 +48,21 @@ export const ProductDetailPage: React.FC = () => {
   const [newReviewTitle, setNewReviewTitle] = useState('');
   const [newReviewComment, setNewReviewComment] = useState('');
   const [newReviewName, setNewReviewName] = useState('');
+
+  const [bundleTier, setBundleTier] = useState<'single' | 'duo' | 'trio'>('single');
+  const [showStickyBar, setShowStickyBar] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 450) {
+        setShowStickyBar(true);
+      } else {
+        setShowStickyBar(false);
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -269,6 +288,100 @@ export const ProductDetailPage: React.FC = () => {
             )}
           </div>
 
+          {/* Scrubsy Inspiration: Merchandising Bundle & Save Selector */}
+          <div className="space-y-2 pt-2">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold uppercase tracking-wider text-brand-dark flex items-center gap-1.5">
+                <Gift className="w-3.5 h-3.5 text-brand-gold" />
+                <span>Bundle & Save More</span>
+              </label>
+              <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                Up to 20% OFF + Free Shaker
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              {/* Single */}
+              <button
+                type="button"
+                onClick={() => {
+                  setBundleTier('single');
+                  setQuantity(1);
+                }}
+                className={`p-3 rounded-2xl border text-left transition-all relative ${
+                  bundleTier === 'single'
+                    ? 'border-brand-primary bg-brand-glow/40 shadow-sm'
+                    : 'border-brand-muted/80 bg-white hover:border-brand-primary/40'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-brand-dark">1 Tub</span>
+                  <span className="text-xs font-semibold text-brand-subtext">Standard</span>
+                </div>
+                <p className="text-sm font-bold text-brand-primary mt-1">₹{selectedVariant.sellingPrice}</p>
+                <p className="text-[10px] text-brand-subtext">Free shipping</p>
+              </button>
+
+              {/* Duo (Most Popular) */}
+              <button
+                type="button"
+                onClick={() => {
+                  setBundleTier('duo');
+                  setQuantity(2);
+                }}
+                className={`p-3 rounded-2xl border text-left transition-all relative ${
+                  bundleTier === 'duo'
+                    ? 'border-brand-gold bg-amber-50/50 shadow-sm ring-1 ring-brand-gold'
+                    : 'border-brand-muted/80 bg-white hover:border-brand-gold/60'
+                }`}
+              >
+                <span className="absolute -top-2.5 right-2 px-2 py-0.5 rounded-full bg-brand-gold text-brand-dark text-[9px] font-extrabold uppercase shadow-sm">
+                  ★ Most Popular
+                </span>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-brand-dark">2 Tubs (Duo)</span>
+                  <span className="text-[10px] font-bold text-emerald-600">Save 15%</span>
+                </div>
+                <p className="text-sm font-bold text-brand-dark mt-1">
+                  ₹{Math.round(selectedVariant.sellingPrice * 2 * 0.85)}
+                </p>
+                <p className="text-[10px] font-bold text-amber-700 flex items-center gap-1 mt-0.5">
+                  <Gift className="w-3 h-3 text-brand-gold flex-shrink-0" />
+                  Free Steel Shaker
+                </p>
+              </button>
+
+              {/* Trio (Best Value) */}
+              <button
+                type="button"
+                onClick={() => {
+                  setBundleTier('trio');
+                  setQuantity(3);
+                }}
+                className={`p-3 rounded-2xl border text-left transition-all relative ${
+                  bundleTier === 'trio'
+                    ? 'border-emerald-600 bg-emerald-50/40 shadow-sm ring-1 ring-emerald-600'
+                    : 'border-brand-muted/80 bg-white hover:border-emerald-600/60'
+                }`}
+              >
+                <span className="absolute -top-2.5 right-2 px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-extrabold uppercase shadow-sm">
+                  Best Value
+                </span>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-brand-dark">3 Tubs (Trio)</span>
+                  <span className="text-[10px] font-bold text-emerald-600">Save 20%</span>
+                </div>
+                <p className="text-sm font-bold text-brand-dark mt-1">
+                  ₹{Math.round(selectedVariant.sellingPrice * 3 * 0.80)}
+                </p>
+                <p className="text-[10px] font-bold text-emerald-700 flex items-center gap-1 mt-0.5">
+                  <Gift className="w-3 h-3 text-emerald-600 flex-shrink-0" />
+                  Free Shaker + Elixir
+                </p>
+              </button>
+            </div>
+          </div>
+
           {/* Quantity and Primary Action CTAs */}
           <div className="space-y-3 pt-2">
             <div className="flex gap-4">
@@ -310,15 +423,30 @@ export const ProductDetailPage: React.FC = () => {
             </button>
           </div>
 
-          {/* Shipping & Guarantee Perks */}
-          <div className="grid grid-cols-2 gap-3 pt-4 border-t border-brand-muted/70 text-xs text-brand-subtext">
-            <div className="flex items-center gap-2">
-              <Truck className="w-4 h-4 text-brand-primary" />
-              <span>Free Delivery above ₹999</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-brand-primary" />
-              <span>Tested for Heavy Metals</span>
+          {/* Scrubsy Inspiration: Indian D2C Confidence & Logistics Strip */}
+          <div className="p-4 rounded-2xl bg-white border border-brand-muted/80 shadow-subtle space-y-3 pt-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-brand-dark">
+              <div className="flex items-center gap-2">
+                <Banknote className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <div>
+                  <p className="font-bold">COD Available</p>
+                  <p className="text-[10px] text-brand-subtext">Pay cash at doorstep</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Truck className="w-4 h-4 text-brand-primary flex-shrink-0" />
+                <div>
+                  <p className="font-bold">2-4 Day Delivery</p>
+                  <p className="text-[10px] text-brand-subtext">Via BlueDart Air</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-brand-gold flex-shrink-0" />
+                <div>
+                  <p className="font-bold">Bloat-Free Promise</p>
+                  <p className="text-[10px] text-brand-subtext">14-day refund guarantee</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -570,6 +698,61 @@ export const ProductDetailPage: React.FC = () => {
             ))}
           </div>
         </section>
+      )}
+
+      {/* Scrubsy Inspiration: Persistent Sticky Bottom ATC Bar on Scroll */}
+      {showStickyBar && (
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-brand-muted shadow-2xl py-3 px-4 sm:px-8 transition-all duration-300 animate-in slide-in-from-bottom">
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <img
+                src={selectedVariant.images[0]}
+                alt={product.title}
+                className="w-12 h-12 rounded-xl object-cover border border-brand-muted/80 flex-shrink-0"
+              />
+              <div className="min-w-0 hidden sm:block">
+                <p className="text-xs font-bold text-brand-dark truncate">{product.title}</p>
+                <p className="text-[11px] text-brand-subtext">
+                  {selectedVariant.flavor} • {selectedVariant.packSize} • {bundleTier === 'duo' ? 'Duo Pack (Free Shaker)' : bundleTier === 'trio' ? 'Trio Pack (20% OFF)' : 'Single Tub'}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="text-right">
+                <p className="text-base sm:text-lg font-bold text-brand-dark">
+                  ₹{bundleTier === 'duo'
+                    ? Math.round(selectedVariant.sellingPrice * 2 * 0.85)
+                    : bundleTier === 'trio'
+                    ? Math.round(selectedVariant.sellingPrice * 3 * 0.80)
+                    : selectedVariant.sellingPrice * quantity}
+                </p>
+                {selectedVariant.mrp > selectedVariant.sellingPrice && (
+                  <p className="text-[10px] text-brand-subtext line-through">
+                    ₹{selectedVariant.mrp * quantity}
+                  </p>
+                )}
+              </div>
+
+              <button
+                onClick={handleAddToCart}
+                disabled={isAdding || !selectedVariant.inStock}
+                className="btn-primary !py-2.5 !px-5 text-xs sm:text-sm gap-2 shadow-sm"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                <span>{isAdding ? 'Adding...' : 'Add to Bag'}</span>
+              </button>
+
+              <button
+                onClick={handleBuyNow}
+                disabled={!selectedVariant.inStock}
+                className="hidden md:inline-flex btn-secondary !py-2.5 !px-5 text-xs sm:text-sm font-semibold border-brand-primary text-brand-primary hover:bg-brand-glow/40"
+              >
+                Buy Now
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
     </div>

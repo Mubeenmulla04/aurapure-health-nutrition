@@ -28,11 +28,11 @@ const BannerSchema = new Schema<IBanner>(
     tagline: String,
     imageDesktop: {
       type: String,
-      required: true,
+      default: '',
     },
     imageMobile: {
       type: String,
-      required: true,
+      default: '',
     },
     ctaText: String,
     ctaLink: String,
