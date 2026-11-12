@@ -14,23 +14,31 @@ export const CartDrawer: React.FC = () => {
       {/* Backdrop */}
       <div
         onClick={closeCartDrawer}
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity animate-in fade-in duration-200"
       />
 
-      <div className="fixed inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+      <div className="fixed inset-y-0 right-0 max-w-full flex pl-0 sm:pl-10">
+        <div className="w-screen max-w-full sm:max-w-md bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
           
           {/* Header */}
-          <div className="p-5 border-b border-brand-muted/70 flex items-center justify-between bg-brand-bg/50">
-            <div className="flex items-center gap-2">
-              <ShoppingBag className="w-5 h-5 text-brand-primary" />
-              <h3 className="font-serif text-lg font-bold text-brand-dark">
-                Your Bag ({cart.totalItemsCount})
-              </h3>
+          <div className="p-4 sm:p-5 border-b border-brand-muted/70 flex items-center justify-between bg-brand-bg/60">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-brand-glow text-brand-primary flex items-center justify-center">
+                <ShoppingBag className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="font-serif text-base sm:text-lg font-bold text-brand-dark">
+                  Your Shopping Bag
+                </h3>
+                <span className="text-[11px] text-brand-subtext font-medium">
+                  {cart.totalItemsCount} {cart.totalItemsCount === 1 ? 'item' : 'items'}
+                </span>
+              </div>
             </div>
             <button
               onClick={closeCartDrawer}
-              className="p-1.5 rounded-full hover:bg-brand-muted/70 text-brand-subtext hover:text-brand-dark transition-colors"
+              className="w-10 h-10 rounded-full hover:bg-brand-muted/70 text-brand-subtext hover:text-brand-dark transition-colors flex items-center justify-center -mr-2"
+              aria-label="Close cart drawer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -60,65 +68,65 @@ export const CartDrawer: React.FC = () => {
           </div>
 
           {/* Cart Items List */}
-          <div className="flex-1 overflow-y-auto p-5 divide-y divide-brand-muted/60">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-5 divide-y divide-brand-muted/60">
             {cart.items.length === 0 ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-6 space-y-4">
                 <div className="w-16 h-16 rounded-full bg-brand-secondary flex items-center justify-center text-brand-subtext">
                   <ShoppingBag className="w-8 h-8 opacity-40" />
                 </div>
                 <h4 className="font-serif text-xl font-bold text-brand-dark">Your bag is empty</h4>
-                <p className="text-sm text-brand-subtext max-w-xs">
+                <p className="text-xs sm:text-sm text-brand-subtext max-w-xs">
                   Discover clean, functional nutrition crafted with Indian botanical adaptogens.
                 </p>
                 <Link
                   to="/collections/plant-protein-powder"
                   onClick={closeCartDrawer}
-                  className="btn-primary !text-xs !py-3 mt-2"
+                  className="btn-primary !text-xs !py-3 !px-6 mt-2"
                 >
                   Explore Plant Proteins
                 </Link>
               </div>
             ) : (
               cart.items.map((item) => (
-                <div key={item.variantId} className="py-4 flex gap-4">
+                <div key={item.variantId} className="py-3.5 sm:py-4 flex gap-3 sm:gap-4">
                   <div className="w-20 h-20 rounded-xl bg-brand-secondary/50 overflow-hidden flex-shrink-0 border border-brand-muted/40">
                     <img src={item.image} alt={item.productTitle} className="w-full h-full object-cover" />
                   </div>
 
-                  <div className="flex-1 flex flex-col justify-between">
+                  <div className="flex-1 flex flex-col justify-between min-w-0">
                     <div>
-                      <div className="flex justify-between items-start">
-                        <h4 className="text-sm font-semibold text-brand-dark line-clamp-1">{item.productTitle}</h4>
+                      <div className="flex justify-between items-start gap-2">
+                        <h4 className="text-xs sm:text-sm font-semibold text-brand-dark line-clamp-1">{item.productTitle}</h4>
                         <button
                           onClick={() => removeItem(item.variantId)}
-                          className="text-brand-subtext hover:text-brand-error p-1 transition-colors"
+                          className="w-8 h-8 -mr-1.5 -mt-1 flex items-center justify-center rounded-full text-brand-subtext hover:text-brand-error hover:bg-red-50 transition-colors"
                           aria-label="Remove item"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
-                      <p className="text-xs text-brand-subtext mt-0.5">
+                      <p className="text-[11px] sm:text-xs text-brand-subtext mt-0.5">
                         {item.flavor} • {item.packSize}
                       </p>
                     </div>
 
-                    <div className="flex items-center justify-between mt-3">
-                      {/* Quantity Stepper */}
-                      <div className="flex items-center border border-brand-muted rounded-full overflow-hidden bg-white">
+                    <div className="flex items-center justify-between mt-2.5">
+                      {/* Quantity Stepper (min 36px touch targets) */}
+                      <div className="flex items-center border border-brand-muted rounded-full overflow-hidden bg-brand-bg/50">
                         <button
                           onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
-                          className="px-2.5 py-1 text-brand-subtext hover:bg-brand-bg transition-colors"
+                          className="w-8 h-8 flex items-center justify-center text-brand-subtext hover:text-brand-dark hover:bg-white transition-colors"
                           aria-label="Decrease quantity"
                         >
-                          <Minus className="w-3 h-3" />
+                          <Minus className="w-3.5 h-3.5" />
                         </button>
-                        <span className="px-2 text-xs font-semibold text-brand-dark">{item.quantity}</span>
+                        <span className="w-7 text-center text-xs font-bold text-brand-dark">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
-                          className="px-2.5 py-1 text-brand-subtext hover:bg-brand-bg transition-colors"
+                          className="w-8 h-8 flex items-center justify-center text-brand-subtext hover:text-brand-dark hover:bg-white transition-colors"
                           aria-label="Increase quantity"
                         >
-                          <Plus className="w-3 h-3" />
+                          <Plus className="w-3.5 h-3.5" />
                         </button>
                       </div>
 
@@ -139,7 +147,7 @@ export const CartDrawer: React.FC = () => {
 
           {/* Footer Checkout Summary */}
           {cart.items.length > 0 && (
-            <div className="p-5 border-t border-brand-muted/80 bg-brand-bg/40 space-y-3">
+            <div className="p-4 sm:p-5 border-t border-brand-muted/80 bg-brand-bg/40 space-y-3 pb-safe">
               <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between text-brand-subtext">
                   <span>Subtotal</span>
@@ -163,23 +171,34 @@ export const CartDrawer: React.FC = () => {
                 </div>
                 <div className="flex justify-between text-base font-bold text-brand-dark pt-2 border-t border-brand-muted/60">
                   <span>Estimated Total</span>
-                  <span>₹{cart.finalTotal}</span>
+                  <span className="text-brand-primary">₹{cart.finalTotal}</span>
                 </div>
               </div>
 
-              <button
-                onClick={() => {
-                  closeCartDrawer();
-                  navigate('/checkout');
-                }}
-                className="w-full btn-primary gap-2 shadow-card"
-              >
-                <span>Proceed to Checkout</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <button
+                  onClick={() => {
+                    closeCartDrawer();
+                    navigate('/cart');
+                  }}
+                  className="btn-outline !py-3 !text-xs font-semibold"
+                >
+                  View Full Bag
+                </button>
+                <button
+                  onClick={() => {
+                    closeCartDrawer();
+                    navigate('/checkout');
+                  }}
+                  className="btn-primary !py-3 !text-xs font-semibold gap-1.5 shadow-card"
+                >
+                  <span>Checkout</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
 
               <p className="text-[10px] text-center text-brand-subtext">
-                Taxes (GST 18%) included. 100% Secure Checkout powered by Razorpay.
+                GST (18%) included • Free delivery above ₹999 • Razorpay Encrypted
               </p>
             </div>
           )}

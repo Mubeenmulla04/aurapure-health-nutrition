@@ -6,6 +6,7 @@ import { WishlistProvider } from './context/WishlistContext';
 
 import { AnnouncementBar } from './components/common/AnnouncementBar';
 import { Navbar } from './components/common/Navbar';
+import { BottomNav } from './components/common/BottomNav';
 import { Footer } from './components/common/Footer';
 import { CartDrawer } from './components/common/CartDrawer';
 import { SearchModal } from './components/common/SearchModal';
@@ -41,7 +42,7 @@ export const App: React.FC = () => {
       <AuthProvider>
         <CartProvider>
           <WishlistProvider>
-            <div className="min-h-screen flex flex-col bg-brand-bg text-brand-dark">
+            <div className="min-h-screen flex flex-col bg-brand-bg text-brand-dark pb-16 lg:pb-0 overflow-x-hidden w-full max-w-full">
               <AnnouncementBar />
               <Navbar onOpenSearch={() => setIsSearchOpen(true)} />
               
@@ -87,6 +88,7 @@ export const App: React.FC = () => {
 
               <Footer />
               <CartDrawer />
+              <BottomNav onOpenSearch={() => setIsSearchOpen(true)} />
               <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
             </div>
           </WishlistProvider>

@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ShieldCheck, Truck, Lock, AlertCircle, ArrowLeft, CheckCircle2, Loader2 } from 'lucide-react';
+import {
+  ShieldCheck,
+  Truck,
+  Lock,
+  AlertCircle,
+  ArrowLeft,
+  CheckCircle2,
+  Loader2,
+  ChevronDown,
+  ShoppingBag,
+  CreditCard,
+  Banknote,
+  Sparkles,
+} from 'lucide-react';
 import { api } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -31,8 +44,10 @@ export const CheckoutPage: React.FC = () => {
   const [isCheckingPincode, setIsCheckingPincode] = useState(false);
 
   // Payment Processing State
+  const [paymentMethod, setPaymentMethod] = useState<'razorpay' | 'cod'>('razorpay');
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isMobileSummaryOpen, setIsMobileSummaryOpen] = useState(false);
 
   // Load Razorpay Script
   useEffect(() => {
@@ -175,13 +190,71 @@ export const CheckoutPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-6 sm:space-y-8 pb-28 sm:pb-12">
       <Link to="/cart" className="inline-flex items-center gap-2 text-xs font-semibold text-brand-primary hover:underline">
         <ArrowLeft className="w-3.5 h-3.5" />
         <span>Return to Shopping Bag</span>
       </Link>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      {/* Collapsible Mobile Order Summary Accordion (Shopify / Apple Style) */}
+      <div className="lg:hidden bg-white rounded-2xl border border-brand-muted/80 overflow-hidden shadow-subtle">
+        <button
+          type="button"
+          onClick={() => setIsMobileSummaryOpen(!isMobileSummaryOpen)}
+          className="w-full p-4 flex items-center justify-between text-xs font-semibold text-brand-dark bg-brand-bg/50"
+        >
+          <div className="flex items-center gap-2">
+            <ShoppingBag className="w-4 h-4 text-brand-primary" />
+            <span>{isMobileSummaryOpen ? 'Hide' : 'Show'} Order Summary ({cart.totalItemsCount})</span>
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isMobileSummaryOpen ? 'rotate-180' : ''}`} />
+          </div>
+          <span className="font-bold text-sm text-brand-primary">₹{cart.finalTotal}</span>
+        </button>
+
+        {isMobileSummaryOpen && (
+          <div className="p-4 border-t border-brand-muted/60 space-y-3 animate-in fade-in duration-150">
+            <div className="divide-y divide-brand-muted/50 max-h-60 overflow-y-auto">
+              {cart.items.map((item) => (
+                <div key={item.variantId} className="py-2.5 flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-lg bg-brand-secondary/60 overflow-hidden flex-shrink-0">
+                    <img src={item.image} alt={item.productTitle} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h5 className="text-xs font-semibold text-brand-dark truncate">{item.productTitle}</h5>
+                    <p className="text-[11px] text-brand-subtext">{item.flavor} • Qty: {item.quantity}</p>
+                  </div>
+                  <span className="text-xs font-bold text-brand-dark">₹{item.total}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-1.5 text-xs text-brand-subtext pt-2 border-t border-brand-muted/60">
+              <div className="flex justify-between">
+                <span>Subtotal</span>
+                <span className="font-semibold text-brand-dark">₹{cart.subtotal}</span>
+              </div>
+              {cart.couponDiscount > 0 && (
+                <div className="flex justify-between text-brand-sage font-medium">
+                  <span>Coupon Discount</span>
+                  <span>-₹{cart.couponDiscount}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span>Shipping</span>
+                <span className="font-semibold text-brand-dark">
+                  {cart.shippingFee === 0 ? <span className="text-brand-sage uppercase">Free</span> : `₹${cart.shippingFee}`}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm font-bold text-brand-dark pt-1.5 border-t border-brand-muted/60">
+                <span>Total Payable</span>
+                <span className="text-brand-primary">₹{cart.finalTotal}</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
         
         {/* Left: Delivery Details Form */}
         <div className="lg:col-span-7 bg-white rounded-3xl border border-brand-muted/80 p-6 sm:p-8 space-y-6">
@@ -316,6 +389,74 @@ export const CheckoutPage: React.FC = () => {
                 </span>
               </div>
             )}
+
+            {/* Payment Method Selection */}
+            <div className="pt-4 border-t border-brand-muted/70 space-y-3">
+              <label className="text-xs font-semibold text-brand-dark block">
+                Choose Payment Method *
+              </label>
+
+              <div className="space-y-2.5">
+                {/* Razorpay Online */}
+                <div
+                  onClick={() => setPaymentMethod('razorpay')}
+                  className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-start gap-3.5 ${
+                    paymentMethod === 'razorpay'
+                      ? 'border-brand-primary bg-brand-glow/30 ring-1 ring-brand-primary'
+                      : 'border-brand-muted bg-white hover:bg-brand-bg/50'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    checked={paymentMethod === 'razorpay'}
+                    onChange={() => setPaymentMethod('razorpay')}
+                    className="mt-1 text-brand-primary focus:ring-brand-primary"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-brand-dark flex items-center gap-2">
+                        <span>UPI / Cards / NetBanking (Razorpay)</span>
+                        <span className="px-2 py-0.5 rounded-full bg-brand-sage/20 text-brand-primary text-[10px] font-bold">
+                          Recommended
+                        </span>
+                      </span>
+                      <CreditCard className="w-4 h-4 text-brand-primary" />
+                    </div>
+                    <p className="text-[11px] text-brand-subtext mt-1">
+                      Google Pay, PhonePe, Paytm, CRED, Visa, Mastercard, RuPay & Net Banking.
+                    </p>
+                  </div>
+                </div>
+
+                {/* COD Option */}
+                <div
+                  onClick={() => setPaymentMethod('cod')}
+                  className={`p-4 rounded-2xl border cursor-pointer transition-all flex items-start gap-3.5 ${
+                    paymentMethod === 'cod'
+                      ? 'border-brand-primary bg-brand-glow/30 ring-1 ring-brand-primary'
+                      : 'border-brand-muted bg-white hover:bg-brand-bg/50'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="paymentMethod"
+                    checked={paymentMethod === 'cod'}
+                    onChange={() => setPaymentMethod('cod')}
+                    className="mt-1 text-brand-primary focus:ring-brand-primary"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-brand-dark">Cash on Delivery (COD)</span>
+                      <Banknote className="w-4 h-4 text-brand-subtext" />
+                    </div>
+                    <p className="text-[11px] text-brand-subtext mt-1">
+                      Pay cash upon delivery. Verified via SMS/WhatsApp confirmation.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </form>
         </div>
 
@@ -393,6 +534,32 @@ export const CheckoutPage: React.FC = () => {
           </div>
         </div>
 
+      </div>
+
+      {/* Sticky Mobile Pay CTA Bar */}
+      <div className="fixed bottom-0 left-0 right-0 p-3.5 bg-white/95 backdrop-blur-md border-t border-brand-muted/80 shadow-floating sm:hidden z-30 pb-safe flex items-center justify-between gap-3">
+        <div>
+          <span className="text-[10px] text-brand-subtext block uppercase font-medium">Payable Amount</span>
+          <span className="text-base font-bold text-brand-primary">₹{cart.finalTotal}</span>
+        </div>
+        <button
+          type="submit"
+          form="checkout-form"
+          disabled={isProcessing}
+          className="btn-primary !py-3 !px-6 !text-xs font-semibold gap-2 shadow-card"
+        >
+          {isProcessing ? (
+            <>
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <span>Processing...</span>
+            </>
+          ) : (
+            <>
+              <Lock className="w-3.5 h-3.5" />
+              <span>Pay ₹{cart.finalTotal}</span>
+            </>
+          )}
+        </button>
       </div>
     </div>
   );

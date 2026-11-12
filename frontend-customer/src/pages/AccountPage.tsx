@@ -132,9 +132,9 @@ export const AccountPage: React.FC<{ defaultTab?: string }> = ({ defaultTab = 'p
       </div>
 
       {/* Tabs Navigation and Panels */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Navigation Sidebar */}
-        <aside className="lg:col-span-3 bg-white rounded-3xl border border-brand-muted/80 p-4 space-y-1">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+        {/* Navigation Tabs (Horizontal swipeable on mobile, Vertical on Desktop) */}
+        <aside className="lg:col-span-3 flex lg:flex-col overflow-x-auto no-scrollbar gap-2 p-1.5 sm:p-3 bg-white rounded-2xl sm:rounded-3xl border border-brand-muted/80 shadow-subtle">
           {[
             { id: 'profile', label: 'My Profile', icon: UserIcon },
             { id: 'orders', label: 'Order History', icon: Package },
@@ -147,13 +147,13 @@ export const AccountPage: React.FC<{ defaultTab?: string }> = ({ defaultTab = 'p
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-semibold transition-all ${
+                className={`flex-shrink-0 flex items-center gap-2.5 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-xl sm:rounded-2xl text-xs font-semibold whitespace-nowrap transition-all ${
                   isActive
                     ? 'bg-brand-primary text-white shadow-subtle'
                     : 'text-brand-dark hover:bg-brand-bg hover:text-brand-primary'
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-4 h-4 flex-shrink-0" />
                 <span>{tab.label}</span>
               </button>
             );
@@ -161,7 +161,7 @@ export const AccountPage: React.FC<{ defaultTab?: string }> = ({ defaultTab = 'p
         </aside>
 
         {/* Tab Body */}
-        <div className="lg:col-span-9 bg-white rounded-3xl border border-brand-muted/80 p-6 sm:p-8">
+        <div className="lg:col-span-9 bg-white rounded-2xl sm:rounded-3xl border border-brand-muted/80 p-5 sm:p-8 shadow-subtle">
           {/* 1. Profile Tab */}
           {activeTab === 'profile' && (
             <div className="space-y-6 max-w-lg">
@@ -234,18 +234,21 @@ export const AccountPage: React.FC<{ defaultTab?: string }> = ({ defaultTab = 'p
                       </div>
 
                       {/* Actions: Download Invoice & Track */}
-                      <div className="flex flex-wrap items-center gap-3 pt-2">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-2">
                         <a
                           href={`http://localhost:5000/api/v1/invoices/${ord._id}/download`}
                           target="_blank"
                           rel="noreferrer"
-                          className="btn-outline !text-xs !py-2 gap-1.5"
+                          className="btn-outline !text-xs !py-2.5 gap-1.5 justify-center flex-1 sm:flex-initial"
                         >
                           <Download className="w-3.5 h-3.5" />
                           <span>Tax Invoice (PDF)</span>
                         </a>
 
-                        <Link to={`/track-order?orderNumber=${ord.orderNumber}`} className="btn-secondary !text-xs !py-2 gap-1.5">
+                        <Link
+                          to={`/track-order?orderNumber=${ord.orderNumber}`}
+                          className="btn-secondary !text-xs !py-2.5 gap-1.5 justify-center flex-1 sm:flex-initial"
+                        >
                           <span>Track Shipment</span>
                         </Link>
                       </div>
@@ -383,33 +386,60 @@ export const AccountPage: React.FC<{ defaultTab?: string }> = ({ defaultTab = 'p
               <h2 className="font-serif text-xl font-bold text-brand-dark">Saved Products ({wishlistItems.length})</h2>
 
               {wishlistItems.length === 0 ? (
-                <div className="py-12 text-center text-brand-subtext text-xs space-y-2">
-                  <Heart className="w-8 h-8 text-brand-subtext mx-auto opacity-40" />
-                  <p>Your wishlist is currently empty.</p>
+                <div className="py-12 text-center text-brand-subtext text-xs space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-brand-secondary mx-auto flex items-center justify-center">
+                    <Heart className="w-6 h-6 text-brand-subtext opacity-50" />
+                  </div>
+                  <p className="text-sm font-medium text-brand-dark">Your wishlist is currently empty.</p>
+                  <p className="text-xs text-brand-subtext max-w-xs mx-auto">
+                    Save your favorite plant proteins, adaptogens, and blends to review anytime.
+                  </p>
+                  <Link to="/collections/plant-protein-powder" className="btn-primary !text-xs !py-2.5 !px-5 mt-2">
+                    Explore Clean Nutrition
+                  </Link>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {wishlistItems.map((item) => (
-                    <div key={item.productId} className="p-4 rounded-2xl border border-brand-muted/70 flex gap-4 items-center">
-                      <img src={item.image} alt={item.productTitle} className="w-16 h-16 rounded-xl object-cover bg-brand-secondary" />
+                    <div
+                      key={item.productId}
+                      className="p-4 rounded-2xl border border-brand-muted/70 bg-white hover:border-brand-primary/40 transition-all flex gap-3.5 items-center shadow-subtle"
+                    >
+                      <div className="w-16 h-16 rounded-xl bg-brand-secondary/60 overflow-hidden flex-shrink-0 border border-brand-muted/40">
+                        <img src={item.image} alt={item.productTitle} className="w-full h-full object-cover" />
+                      </div>
                       <div className="flex-1 min-w-0">
-                        <Link to={`/products/${item.productSlug}`} className="text-xs font-bold text-brand-dark hover:text-brand-primary truncate block">
+                        <Link
+                          to={`/products/${item.productSlug}`}
+                          className="text-xs sm:text-sm font-bold text-brand-dark hover:text-brand-primary truncate block"
+                        >
                           {item.productTitle}
                         </Link>
-                        <span className="text-xs font-bold text-brand-dark mt-1 block">₹{item.price}</span>
+                        <span className="text-xs font-bold text-brand-primary mt-1 block">₹{item.price}</span>
                       </div>
-                      <button
-                        onClick={() => {
-                          if (item.variantId) {
-                            addItem(item.variantId, 1);
-                            toggleWishlist(item.productId);
-                          }
-                        }}
-                        className="btn-primary !p-2 !rounded-full"
-                        title="Move to bag"
-                      >
-                        <ShoppingBag className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <button
+                          onClick={() => {
+                            if (item.variantId) {
+                              addItem(item.variantId, 1);
+                              toggleWishlist(item.productId);
+                            }
+                          }}
+                          className="w-9 h-9 rounded-full bg-brand-primary text-white flex items-center justify-center hover:bg-brand-primary-hover shadow-subtle transition-colors"
+                          title="Move to bag"
+                          aria-label="Move to shopping bag"
+                        >
+                          <ShoppingBag className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => toggleWishlist(item.productId)}
+                          className="w-9 h-9 rounded-full text-brand-subtext hover:text-brand-error hover:bg-red-50 flex items-center justify-center transition-colors"
+                          title="Remove from wishlist"
+                          aria-label="Remove from wishlist"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>

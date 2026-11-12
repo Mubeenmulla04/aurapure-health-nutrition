@@ -169,46 +169,79 @@ export const ProductDetailPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+    <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-8 space-y-6 sm:space-y-12 pb-24 sm:pb-16">
       
       {/* Breadcrumb Navigation */}
-      <nav className="flex items-center gap-2 text-xs text-brand-subtext">
+      <nav className="flex items-center gap-1.5 text-xs text-brand-subtext">
         <Link to="/" className="hover:text-brand-primary">Home</Link>
         <ChevronRight className="w-3.5 h-3.5" />
         <Link to="/collections" className="hover:text-brand-primary">Collections</Link>
         <ChevronRight className="w-3.5 h-3.5" />
-        <span className="font-semibold text-brand-dark truncate max-w-xs">{product.title}</span>
+        <span className="font-semibold text-brand-dark truncate max-w-[160px] sm:max-w-xs">{product.title}</span>
       </nav>
 
       {/* Main PDP Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-12 items-start">
         
-        {/* Left: Product Images Gallery */}
-        <div className="lg:col-span-6 space-y-4">
-          <div className="aspect-square rounded-3xl overflow-hidden bg-brand-secondary/60 border border-brand-muted/80 shadow-subtle relative">
+        {/* Left: Product Images Gallery with Mobile Touch-Friendly Swipe */}
+        <div className="lg:col-span-6 space-y-3 sm:space-y-4">
+          <div className="aspect-square rounded-2xl sm:rounded-3xl overflow-hidden bg-brand-secondary/60 border border-brand-muted/80 shadow-subtle relative group">
             <img
               src={selectedVariant.images[selectedImageIndex] || selectedVariant.images[0]}
               alt={product.title}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transition-transform duration-300"
             />
+            
             {selectedVariant.discountPercent > 0 && (
-              <span className="absolute top-4 left-4 px-3 py-1.5 rounded-full bg-brand-gold text-white text-xs font-bold uppercase tracking-wider shadow-sm">
+              <span className="absolute top-3 left-3 sm:top-4 sm:left-4 px-2.5 py-1 rounded-full bg-brand-gold text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-sm">
                 Save {selectedVariant.discountPercent}%
               </span>
+            )}
+
+            {/* Quick Wishlist Toggle on Image */}
+            <button
+              type="button"
+              onClick={() => toggleWishlist(product._id, selectedVariant._id)}
+              className={`absolute top-3 right-3 sm:top-4 sm:right-4 p-2 rounded-full backdrop-blur-md transition-all active:scale-90 ${
+                isWishlisted
+                  ? 'bg-red-50 text-brand-error'
+                  : 'bg-white/80 text-brand-subtext hover:text-brand-primary hover:bg-white shadow-xs'
+              }`}
+              aria-label="Save to Wishlist"
+            >
+              <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
+            </button>
+
+            {/* Mobile Image Dot Indicators */}
+            {selectedVariant.images.length > 1 && (
+              <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 z-10">
+                {selectedVariant.images.map((_, idx) => (
+                  <button
+                    type="button"
+                    key={idx}
+                    onClick={() => setSelectedImageIndex(idx)}
+                    className={`h-1.5 rounded-full transition-all ${
+                      selectedImageIndex === idx ? 'w-5 bg-brand-primary' : 'w-1.5 bg-black/30'
+                    }`}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
+              </div>
             )}
           </div>
 
           {/* Thumbnails Strip */}
           {selectedVariant.images.length > 1 && (
-            <div className="flex gap-3 overflow-x-auto pb-1">
+            <div className="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar pb-1">
               {selectedVariant.images.map((img, idx) => (
                 <button
+                  type="button"
                   key={idx}
                   onClick={() => setSelectedImageIndex(idx)}
-                  className={`w-20 h-20 rounded-2xl overflow-hidden border-2 flex-shrink-0 transition-all ${
+                  className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl sm:rounded-2xl overflow-hidden border-2 flex-shrink-0 transition-all ${
                     selectedImageIndex === idx
                       ? 'border-brand-primary shadow-subtle'
-                      : 'border-transparent opacity-70 hover:opacity-100'
+                      : 'border-transparent opacity-60 hover:opacity-100'
                   }`}
                 >
                   <img src={img} alt="Thumbnail" className="w-full h-full object-cover" />
@@ -219,84 +252,129 @@ export const ProductDetailPage: React.FC = () => {
         </div>
 
         {/* Right: Product Purchase Details */}
-        <div className="lg:col-span-6 space-y-6">
+        <div className="lg:col-span-6 space-y-4 sm:space-y-6">
           
           {/* Header Badges & Rating */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-semibold">
+            <div className="flex items-center gap-1.5 text-xs font-semibold">
               <div className="flex items-center text-amber-500">
-                <Star className="w-4 h-4 fill-current" />
+                <Star className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" />
               </div>
               <span className="font-bold text-brand-dark">{product.rating}</span>
-              <span className="text-brand-subtext">({product.reviewCount} customer reviews)</span>
+              <span className="text-brand-subtext text-[11px] sm:text-xs">({product.reviewCount} reviews)</span>
             </div>
 
-            <button
-              onClick={() => toggleWishlist(product._id, selectedVariant._id)}
-              className={`p-2 rounded-full border transition-all ${
-                isWishlisted
-                  ? 'bg-red-50 border-red-200 text-brand-error'
-                  : 'bg-white border-brand-muted text-brand-subtext hover:text-brand-primary'
-              }`}
-              aria-label="Save to Wishlist"
-            >
-              <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
-            </button>
+            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-brand-primary bg-brand-glow px-2.5 py-0.5 rounded-full">
+              Lab Certified
+            </span>
           </div>
 
           {/* Title & Subtitle */}
           <div>
-            <h1 className="font-serif text-2xl sm:text-3xl font-bold text-brand-dark leading-tight">
+            <h1 className="font-serif text-xl sm:text-3xl font-bold text-brand-dark leading-snug">
               {product.title}
             </h1>
-            <p className="text-sm text-brand-subtext mt-1.5 leading-relaxed">{product.subtitle}</p>
+            <p className="text-xs sm:text-sm text-brand-subtext mt-1 leading-relaxed">{product.subtitle}</p>
           </div>
 
           {/* Price Box */}
-          <div className="p-4 rounded-2xl bg-brand-secondary/40 border border-brand-muted/60 flex items-baseline gap-3">
-            <span className="text-3xl font-bold text-brand-dark">₹{selectedVariant.sellingPrice}</span>
+          <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-brand-secondary/40 border border-brand-muted/60 flex items-baseline gap-2.5">
+            <span className="text-2xl sm:text-3xl font-bold text-brand-dark">₹{selectedVariant.sellingPrice}</span>
             {selectedVariant.mrp > selectedVariant.sellingPrice && (
-              <span className="text-base text-brand-subtext line-through">₹{selectedVariant.mrp}</span>
+              <span className="text-xs sm:text-base text-brand-subtext line-through">₹{selectedVariant.mrp}</span>
             )}
-            <span className="text-xs font-semibold text-brand-primary bg-brand-glow px-2.5 py-1 rounded-full ml-auto">
-              Inclusive of 18% GST
+            <span className="text-[10px] sm:text-xs font-semibold text-brand-primary bg-brand-glow px-2 py-0.5 rounded-full ml-auto">
+              Incl. 18% GST
             </span>
           </div>
 
           {/* Variant Selectors: Flavor */}
-          <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-brand-dark">
-              Selected Flavor: <span className="text-brand-primary font-normal">{selectedVariant.flavor}</span>
+          <div className="space-y-1.5 sm:space-y-2">
+            <label className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-brand-dark flex items-center justify-between">
+              <span>Flavor: <strong className="text-brand-primary">{selectedVariant.flavor}</strong></span>
+              <span className="text-[10px] text-brand-subtext font-normal">Natural Botanicals</span>
             </label>
             <div className="flex flex-wrap gap-2">
-              {product.variants.map((v) => (
-                <button
-                  key={v._id}
-                  onClick={() => {
-                    setSelectedVariant(v);
-                    setSelectedImageIndex(0);
-                  }}
-                  className={`px-4 py-2 rounded-xl text-xs font-semibold border transition-all ${
-                    selectedVariant._id === v._id
-                      ? 'border-brand-primary bg-brand-primary text-white shadow-subtle'
-                      : 'border-brand-muted bg-white text-brand-dark hover:border-brand-primary'
-                  }`}
-                >
-                  {v.flavor}
-                </button>
-              ))}
+              {/* If product has sister protein flavors, provide quick switches */}
+              {product.slug.includes('protein') ? (
+                [
+                  { name: 'Belgian Dark Chocolate', slug: 'plant-protein-belgian-dark-chocolate' },
+                  { name: 'Madagascar Vanilla', slug: 'plant-protein-madagascar-vanilla' },
+                  { name: 'Raw Unflavored', slug: 'raw-unflavored-plant-protein' },
+                ].map((flv) => {
+                  const isActive = product.slug === flv.slug;
+                  return (
+                    <Link
+                      key={flv.slug}
+                      to={`/products/${flv.slug}`}
+                      className={`min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-semibold border transition-all flex items-center gap-1.5 ${
+                        isActive
+                          ? 'border-brand-primary bg-brand-primary text-white shadow-subtle'
+                          : 'border-brand-muted bg-white text-brand-dark hover:border-brand-primary'
+                      }`}
+                    >
+                      <span>{flv.name}</span>
+                    </Link>
+                  );
+                })
+              ) : (
+                Array.from(new Set(product.variants.map((v) => v.flavor))).map((flvName) => {
+                  const matchingVar = product.variants.find((v) => v.flavor === flvName);
+                  const isCurrent = selectedVariant.flavor === flvName;
+                  return (
+                    <button
+                      type="button"
+                      key={flvName}
+                      onClick={() => {
+                        if (matchingVar) {
+                          setSelectedVariant(matchingVar);
+                          setSelectedImageIndex(0);
+                        }
+                      }}
+                      className={`min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-semibold border transition-all ${
+                        isCurrent
+                          ? 'border-brand-primary bg-brand-primary text-white shadow-subtle'
+                          : 'border-brand-muted bg-white text-brand-dark hover:border-brand-primary'
+                      }`}
+                    >
+                      {flvName}
+                    </button>
+                  );
+                })
+              )}
             </div>
           </div>
 
           {/* Variant Selectors: Pack Size */}
-          <div className="space-y-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-brand-dark">
-              Pack Size: <span className="text-brand-primary font-normal">{selectedVariant.packSize}</span>
+          <div className="space-y-1.5 sm:space-y-2">
+            <label className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-brand-dark flex items-center justify-between">
+              <span>Pack Size: <strong className="text-brand-primary">{selectedVariant.packSize}</strong></span>
+              {selectedVariant.weightGrams && (
+                <span className="text-[10px] text-brand-subtext font-normal">{selectedVariant.weightGrams}g Net</span>
+              )}
             </label>
             <div className="flex flex-wrap gap-2">
-              <span className="px-4 py-2 rounded-xl text-xs font-semibold border border-brand-primary bg-brand-glow text-brand-primary">
-                {selectedVariant.packSize}
-              </span>
+              {product.variants.map((v) => {
+                const isSelected = selectedVariant._id === v._id;
+                return (
+                  <button
+                    type="button"
+                    key={v._id}
+                    onClick={() => {
+                      setSelectedVariant(v);
+                      setSelectedImageIndex(0);
+                    }}
+                    className={`min-h-[44px] px-4 py-2.5 rounded-xl text-xs font-semibold border transition-all flex items-center gap-2 ${
+                      isSelected
+                        ? 'border-brand-primary bg-brand-glow text-brand-primary ring-2 ring-brand-primary/20 font-bold'
+                        : 'border-brand-muted bg-white text-brand-dark hover:border-brand-primary'
+                    }`}
+                  >
+                    <span>{v.packSize}</span>
+                    <span className="text-[11px] font-bold">₹{v.sellingPrice}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -304,32 +382,32 @@ export const ProductDetailPage: React.FC = () => {
           <div className="flex items-center gap-2 text-xs font-semibold">
             {selectedVariant.inStock ? (
               <>
-                <div className="w-2.5 h-2.5 rounded-full bg-brand-sage animate-pulse" />
-                <span className="text-brand-sage">
-                  In Stock ({selectedVariant.stockQuantity} units remaining) • Ships Today
+                <div className="w-2 h-2 rounded-full bg-brand-sage animate-pulse" />
+                <span className="text-brand-sage text-xs">
+                  In Stock ({selectedVariant.stockQuantity} units) • Same Day Air Dispatch
                 </span>
               </>
             ) : (
               <>
-                <div className="w-2.5 h-2.5 rounded-full bg-brand-error" />
-                <span className="text-brand-error">Currently Out of Stock</span>
+                <div className="w-2 h-2 rounded-full bg-brand-error" />
+                <span className="text-brand-error text-xs">Currently Out of Stock</span>
               </>
             )}
           </div>
 
           {/* Scrubsy Inspiration: Merchandising Bundle & Save Selector */}
-          <div className="space-y-2 pt-2">
+          <div className="space-y-2 pt-1">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold uppercase tracking-wider text-brand-dark flex items-center gap-1.5">
+              <label className="text-[11px] sm:text-xs font-bold uppercase tracking-wider text-brand-dark flex items-center gap-1.5">
                 <Gift className="w-3.5 h-3.5 text-brand-gold" />
                 <span>Bundle & Save More</span>
               </label>
-              <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                 Up to 20% OFF + Free Shaker
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-3 gap-2">
               {/* Single */}
               <button
                 type="button"
@@ -337,18 +415,17 @@ export const ProductDetailPage: React.FC = () => {
                   setBundleTier('single');
                   setQuantity(1);
                 }}
-                className={`p-3 rounded-2xl border text-left transition-all relative ${
+                className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border text-left transition-all ${
                   bundleTier === 'single'
-                    ? 'border-brand-primary bg-brand-glow/40 shadow-sm'
+                    ? 'border-brand-primary bg-brand-glow/40 shadow-xs ring-1 ring-brand-primary'
                     : 'border-brand-muted/80 bg-white hover:border-brand-primary/40'
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-brand-dark">1 Tub</span>
-                  <span className="text-xs font-semibold text-brand-subtext">Standard</span>
+                  <span className="text-[11px] sm:text-xs font-bold text-brand-dark">1 Tub</span>
                 </div>
-                <p className="text-sm font-bold text-brand-primary mt-1">₹{selectedVariant.sellingPrice}</p>
-                <p className="text-[10px] text-brand-subtext">Free shipping</p>
+                <p className="text-xs sm:text-sm font-bold text-brand-primary mt-0.5">₹{selectedVariant.sellingPrice}</p>
+                <p className="text-[9px] text-brand-subtext">Standard</p>
               </button>
 
               {/* Duo (Most Popular) */}
@@ -358,25 +435,23 @@ export const ProductDetailPage: React.FC = () => {
                   setBundleTier('duo');
                   setQuantity(2);
                 }}
-                className={`p-3 rounded-2xl border text-left transition-all relative ${
+                className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border text-left transition-all relative ${
                   bundleTier === 'duo'
-                    ? 'border-brand-gold bg-amber-50/50 shadow-sm ring-1 ring-brand-gold'
+                    ? 'border-brand-gold bg-amber-50/60 shadow-xs ring-1 ring-brand-gold'
                     : 'border-brand-muted/80 bg-white hover:border-brand-gold/60'
                 }`}
               >
-                <span className="absolute -top-2.5 right-2 px-2 py-0.5 rounded-full bg-brand-gold text-brand-dark text-[9px] font-extrabold uppercase shadow-sm">
-                  ★ Most Popular
+                <span className="absolute -top-2 right-1.5 px-1.5 py-0.2 rounded-full bg-brand-gold text-brand-dark text-[8px] font-extrabold uppercase shadow-xs">
+                  ★ Popular
                 </span>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-brand-dark">2 Tubs (Duo)</span>
-                  <span className="text-[10px] font-bold text-emerald-600">Save 15%</span>
+                  <span className="text-[11px] sm:text-xs font-bold text-brand-dark">2 Tubs</span>
                 </div>
-                <p className="text-sm font-bold text-brand-dark mt-1">
+                <p className="text-xs sm:text-sm font-bold text-brand-dark mt-0.5">
                   ₹{Math.round(selectedVariant.sellingPrice * 2 * 0.85)}
                 </p>
-                <p className="text-[10px] font-bold text-amber-700 flex items-center gap-1 mt-0.5">
-                  <Gift className="w-3 h-3 text-brand-gold flex-shrink-0" />
-                  Free Steel Shaker
+                <p className="text-[9px] font-bold text-amber-700 truncate mt-0.5">
+                  🎁 Free Shaker
                 </p>
               </button>
 
@@ -387,55 +462,58 @@ export const ProductDetailPage: React.FC = () => {
                   setBundleTier('trio');
                   setQuantity(3);
                 }}
-                className={`p-3 rounded-2xl border text-left transition-all relative ${
+                className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border text-left transition-all relative ${
                   bundleTier === 'trio'
-                    ? 'border-emerald-600 bg-emerald-50/40 shadow-sm ring-1 ring-emerald-600'
+                    ? 'border-emerald-600 bg-emerald-50/50 shadow-xs ring-1 ring-emerald-600'
                     : 'border-brand-muted/80 bg-white hover:border-emerald-600/60'
                 }`}
               >
-                <span className="absolute -top-2.5 right-2 px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-extrabold uppercase shadow-sm">
+                <span className="absolute -top-2 right-1.5 px-1.5 py-0.2 rounded-full bg-emerald-600 text-white text-[8px] font-extrabold uppercase shadow-xs">
                   Best Value
                 </span>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-brand-dark">3 Tubs (Trio)</span>
-                  <span className="text-[10px] font-bold text-emerald-600">Save 20%</span>
+                  <span className="text-[11px] sm:text-xs font-bold text-brand-dark">3 Tubs</span>
                 </div>
-                <p className="text-sm font-bold text-brand-dark mt-1">
+                <p className="text-xs sm:text-sm font-bold text-brand-dark mt-0.5">
                   ₹{Math.round(selectedVariant.sellingPrice * 3 * 0.80)}
                 </p>
-                <p className="text-[10px] font-bold text-emerald-700 flex items-center gap-1 mt-0.5">
-                  <Gift className="w-3 h-3 text-emerald-600 flex-shrink-0" />
-                  Free Shaker + Elixir
+                <p className="text-[9px] font-bold text-emerald-700 truncate mt-0.5">
+                  🎁 Free Gifts
                 </p>
               </button>
             </div>
           </div>
 
           {/* Quantity and Primary Action CTAs */}
-          <div className="space-y-3 pt-2">
-            <div className="flex gap-4">
-              {/* Stepper */}
-              <div className="flex items-center border border-brand-muted rounded-full bg-white px-2">
+          <div className="space-y-2.5 pt-1">
+            <div className="flex gap-2.5 sm:gap-4">
+              {/* Stepper with accessible 44px height */}
+              <div className="flex items-center border border-brand-muted rounded-full bg-white px-1 sm:px-2 min-h-[44px]">
                 <button
+                  type="button"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="p-2 text-brand-subtext hover:text-brand-dark"
+                  className="p-2 text-brand-subtext hover:text-brand-dark active:scale-95"
+                  aria-label="Decrease quantity"
                 >
                   <Minus className="w-3.5 h-3.5" />
                 </button>
-                <span className="px-3 text-sm font-bold text-brand-dark">{quantity}</span>
+                <span className="px-2 sm:px-3 text-xs sm:text-sm font-bold text-brand-dark">{quantity}</span>
                 <button
+                  type="button"
                   onClick={() => setQuantity(quantity + 1)}
-                  className="p-2 text-brand-subtext hover:text-brand-dark"
+                  className="p-2 text-brand-subtext hover:text-brand-dark active:scale-95"
+                  aria-label="Increase quantity"
                 >
                   <Plus className="w-3.5 h-3.5" />
                 </button>
               </div>
 
-              {/* Add to Cart */}
+              {/* Add to Cart Button */}
               <button
+                type="button"
                 onClick={handleAddToCart}
                 disabled={isAdding || !selectedVariant.inStock}
-                className="flex-1 btn-primary gap-2 !py-4 shadow-card"
+                className="flex-1 btn-primary gap-2 min-h-[44px] !py-3 shadow-card active:scale-98 text-xs sm:text-sm"
               >
                 <ShoppingBag className="w-4 h-4" />
                 <span>{isAdding ? 'Adding...' : 'Add to Bag'}</span>
@@ -444,36 +522,37 @@ export const ProductDetailPage: React.FC = () => {
 
             {/* Buy Now Direct Checkout */}
             <button
+              type="button"
               onClick={handleBuyNow}
               disabled={!selectedVariant.inStock}
-              className="w-full btn-secondary !py-4 text-sm font-semibold border-brand-primary text-brand-primary hover:bg-brand-glow/40"
+              className="w-full btn-secondary min-h-[44px] !py-3 text-xs sm:text-sm font-semibold border-brand-primary text-brand-primary hover:bg-brand-glow/40 active:scale-98"
             >
               Buy Now (Express Checkout)
             </button>
           </div>
 
-          {/* Scrubsy Inspiration: Indian D2C Confidence & Logistics Strip */}
-          <div className="p-4 rounded-2xl bg-white border border-brand-muted/80 shadow-subtle space-y-3 pt-3">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs text-brand-dark">
-              <div className="flex items-center gap-2">
+          {/* Indian D2C Confidence & Logistics Strip */}
+          <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-brand-muted/80 shadow-xs">
+            <div className="grid grid-cols-3 gap-2 text-center sm:text-left text-[11px] text-brand-dark">
+              <div className="flex flex-col sm:flex-row items-center gap-1.5">
                 <Banknote className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                 <div>
-                  <p className="font-bold">COD Available</p>
-                  <p className="text-[10px] text-brand-subtext">Pay cash at doorstep</p>
+                  <p className="font-bold">COD</p>
+                  <p className="text-[9px] text-brand-subtext hidden sm:block">Pay at doorstep</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-center gap-1.5 border-x border-brand-muted/70 px-1 sm:px-2">
                 <Truck className="w-4 h-4 text-brand-primary flex-shrink-0" />
                 <div>
-                  <p className="font-bold">2-4 Day Delivery</p>
-                  <p className="text-[10px] text-brand-subtext">Via BlueDart Air</p>
+                  <p className="font-bold">2-4 Days</p>
+                  <p className="text-[9px] text-brand-subtext hidden sm:block">BlueDart Air</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-brand-gold flex-shrink-0" />
                 <div>
-                  <p className="font-bold">Bloat-Free Promise</p>
-                  <p className="text-[10px] text-brand-subtext">14-day refund guarantee</p>
+                  <p className="font-bold">14-Day Guarantee</p>
+                  <p className="text-[9px] text-brand-subtext hidden sm:block">Zero-bloat refund</p>
                 </div>
               </div>
             </div>
@@ -482,52 +561,53 @@ export const ProductDetailPage: React.FC = () => {
       </div>
 
       {/* Nutritional Highlights Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-6 sm:p-8 rounded-3xl bg-brand-secondary/40 border border-brand-muted/80">
-        <div className="p-4 rounded-2xl bg-white border border-brand-muted/60 text-center space-y-1">
-          <span className="text-xs text-brand-subtext uppercase font-semibold">Protein / Scoop</span>
-          <p className="font-serif text-3xl font-bold text-brand-primary">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 p-4 sm:p-8 rounded-2xl sm:rounded-3xl bg-brand-secondary/40 border border-brand-muted/80">
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-brand-muted/60 text-center space-y-0.5 sm:space-y-1">
+          <span className="text-[10px] sm:text-xs text-brand-subtext uppercase font-semibold">Protein / Scoop</span>
+          <p className="font-serif text-2xl sm:text-3xl font-bold text-brand-primary">
             {product.nutritionalHighlights?.proteinPerServing || '25g'}
           </p>
-          <span className="text-[11px] text-brand-subtext">Complete Plant Isolate</span>
+          <span className="text-[10px] text-brand-subtext">Pure Plant Isolate</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-brand-muted/60 text-center space-y-1">
-          <span className="text-xs text-brand-subtext uppercase font-semibold">BCAAs</span>
-          <p className="font-serif text-3xl font-bold text-brand-primary">
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-brand-muted/60 text-center space-y-0.5 sm:space-y-1">
+          <span className="text-[10px] sm:text-xs text-brand-subtext uppercase font-semibold">BCAAs</span>
+          <p className="font-serif text-2xl sm:text-3xl font-bold text-brand-primary">
             {product.nutritionalHighlights?.bcaa || '4.8g'}
           </p>
-          <span className="text-[11px] text-brand-subtext">Naturally Occurring</span>
+          <span className="text-[10px] text-brand-subtext">Naturally Occurring</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-brand-muted/60 text-center space-y-1">
-          <span className="text-xs text-brand-subtext uppercase font-semibold">Added Sugar</span>
-          <p className="font-serif text-3xl font-bold text-brand-primary">
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-brand-muted/60 text-center space-y-0.5 sm:space-y-1">
+          <span className="text-[10px] sm:text-xs text-brand-subtext uppercase font-semibold">Added Sugar</span>
+          <p className="font-serif text-2xl sm:text-3xl font-bold text-brand-primary">
             {product.nutritionalHighlights?.addedSugar || '0g'}
           </p>
-          <span className="text-[11px] text-brand-subtext">Monk Fruit Sweetened</span>
+          <span className="text-[10px] text-brand-subtext">Monk Fruit Sweetened</span>
         </div>
 
-        <div className="p-4 rounded-2xl bg-white border border-brand-muted/60 text-center space-y-1">
-          <span className="text-xs text-brand-subtext uppercase font-semibold">Digestive Comfort</span>
-          <p className="font-serif text-xl font-bold text-brand-primary pt-2">
-            Papain & Bromelain
+        <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-white border border-brand-muted/60 text-center space-y-0.5 sm:space-y-1">
+          <span className="text-[10px] sm:text-xs text-brand-subtext uppercase font-semibold">Digestive Comfort</span>
+          <p className="font-serif text-lg sm:text-xl font-bold text-brand-primary pt-1">
+            DigeZyme Active
           </p>
-          <span className="text-[11px] text-brand-subtext">Zero Bloating Guarantee</span>
+          <span className="text-[10px] text-brand-subtext">Zero Bloat Guarantee</span>
         </div>
       </div>
 
       {/* Expandable Tabs: Benefits, Ingredients, Usage */}
-      <div className="bg-white rounded-3xl border border-brand-muted/80 p-6 sm:p-10 space-y-8">
-        <div className="flex border-b border-brand-muted/80 gap-6">
+      <div className="bg-white rounded-2xl sm:rounded-3xl border border-brand-muted/80 p-4 sm:p-10 space-y-5 sm:space-y-8">
+        <div className="flex border-b border-brand-muted/80 gap-3 sm:gap-6 overflow-x-auto no-scrollbar">
           {[
-            { id: 'benefits', label: 'Key Health Benefits' },
+            { id: 'benefits', label: 'Health Benefits' },
             { id: 'ingredients', label: 'Ingredients & Sourcing' },
             { id: 'howToUse', label: 'How to Enjoy' },
           ].map((tab) => (
             <button
+              type="button"
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`pb-3 text-sm font-semibold transition-all relative ${
+              className={`pb-3 text-xs sm:text-sm font-semibold transition-all whitespace-nowrap relative ${
                 activeTab === tab.id ? 'text-brand-primary' : 'text-brand-subtext hover:text-brand-dark'
               }`}
             >
@@ -541,9 +621,9 @@ export const ProductDetailPage: React.FC = () => {
 
         <div>
           {activeTab === 'benefits' && (
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {product.benefits.map((b, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm text-brand-dark">
+                <li key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-brand-dark">
                   <CheckCircle2 className="w-4 h-4 text-brand-sage flex-shrink-0 mt-0.5" />
                   <span>{b}</span>
                 </li>
@@ -552,15 +632,15 @@ export const ProductDetailPage: React.FC = () => {
           )}
 
           {activeTab === 'ingredients' && (
-            <div className="space-y-4">
-              <p className="text-sm text-brand-subtext leading-relaxed">
-                We believe in full formulation transparency. We never disguise ingredients behind proprietary blends.
+            <div className="space-y-3 sm:space-y-4">
+              <p className="text-xs sm:text-sm text-brand-subtext leading-relaxed">
+                Full formulation transparency. Never disguised behind proprietary blends.
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
                 {product.ingredients.map((ing, i) => (
                   <span
                     key={i}
-                    className="px-3.5 py-1.5 rounded-full bg-brand-secondary text-xs font-medium text-brand-dark border border-brand-muted/60"
+                    className="px-3 py-1 rounded-full bg-brand-secondary text-[11px] sm:text-xs font-medium text-brand-dark border border-brand-muted/60"
                   >
                     {ing}
                   </span>
@@ -570,11 +650,11 @@ export const ProductDetailPage: React.FC = () => {
           )}
 
           {activeTab === 'howToUse' && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-6">
               {product.howToUse.map((step, i) => (
-                <div key={i} className="p-5 rounded-2xl bg-brand-bg border border-brand-muted/60 space-y-2">
-                  <span className="text-xs font-bold text-brand-primary uppercase tracking-wider">{step.step}</span>
-                  <p className="text-sm text-brand-dark font-medium">{step.description}</p>
+                <div key={i} className="p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-brand-bg border border-brand-muted/60 space-y-1.5">
+                  <span className="text-[10px] font-bold text-brand-primary uppercase tracking-wider">{step.step}</span>
+                  <p className="text-xs sm:text-sm text-brand-dark font-medium">{step.description}</p>
                 </div>
               ))}
             </div>
@@ -583,57 +663,61 @@ export const ProductDetailPage: React.FC = () => {
       </div>
 
       {/* Customer Reviews Section */}
-      <div className="bg-white rounded-3xl border border-brand-muted/80 p-6 sm:p-10 space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-brand-muted/70">
+      <div className="bg-white rounded-2xl sm:rounded-3xl border border-brand-muted/80 p-4 sm:p-10 space-y-6 sm:space-y-8">
+        <div className="flex items-center justify-between gap-4 pb-4 sm:pb-6 border-b border-brand-muted/70">
           <div>
-            <h3 className="font-serif text-2xl font-bold text-brand-dark">Verified Shopper Reviews</h3>
-            <div className="flex items-center gap-2 mt-1">
+            <h3 className="font-serif text-lg sm:text-2xl font-bold text-brand-dark">Customer Reviews</h3>
+            <div className="flex items-center gap-1.5 mt-0.5">
               <div className="flex text-amber-500">
                 {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-current" />
+                  <Star key={i} className="w-3.5 h-3.5 fill-current" />
                 ))}
               </div>
-              <span className="text-sm font-bold text-brand-dark">{product.rating} out of 5</span>
-              <span className="text-xs text-brand-subtext">({reviews.length} reviews)</span>
+              <span className="text-xs font-bold text-brand-dark">{product.rating} / 5</span>
+              <span className="text-[11px] text-brand-subtext">({reviews.length})</span>
             </div>
           </div>
 
-          <button onClick={() => setIsReviewModalOpen(true)} className="btn-outline !text-xs !py-3">
-            Write a Review
+          <button
+            type="button"
+            onClick={() => setIsReviewModalOpen(true)}
+            className="btn-outline !text-xs !py-2 sm:!py-2.5 !px-3 sm:!px-5"
+          >
+            Write Review
           </button>
         </div>
 
         {/* Reviews List */}
-        <div className="divide-y divide-brand-muted/60 space-y-6">
+        <div className="divide-y divide-brand-muted/60 space-y-4">
           {reviews.length === 0 ? (
-            <p className="text-sm text-brand-subtext text-center py-8">
+            <p className="text-xs sm:text-sm text-brand-subtext text-center py-6">
               Be the first to review this clean formulation!
             </p>
           ) : (
             reviews.map((rev) => (
-              <div key={rev._id} className="pt-6 first:pt-0 space-y-2">
+              <div key={rev._id} className="pt-4 first:pt-0 space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-brand-dark">{rev.userName}</span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs sm:text-sm font-bold text-brand-dark">{rev.userName}</span>
                     {rev.verifiedPurchase && (
-                      <span className="px-2 py-0.5 rounded-full bg-brand-glow text-brand-primary text-[10px] font-bold">
-                        ✓ Verified Buyer
+                      <span className="px-1.5 py-0.2 rounded-full bg-brand-glow text-brand-primary text-[9px] font-bold">
+                        ✓ Verified
                       </span>
                     )}
                   </div>
-                  <span className="text-xs text-brand-subtext">
+                  <span className="text-[10px] text-brand-subtext">
                     {new Date(rev.createdAt).toLocaleDateString('en-IN')}
                   </span>
                 </div>
 
                 <div className="flex items-center text-amber-500 gap-0.5">
                   {[...Array(rev.rating)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                    <Star key={i} className="w-3 h-3 fill-current" />
                   ))}
                 </div>
 
-                <h4 className="text-sm font-bold text-brand-dark">{rev.title}</h4>
-                <p className="text-sm text-brand-subtext leading-relaxed">{rev.comment}</p>
+                <h4 className="text-xs sm:text-sm font-bold text-brand-dark">{rev.title}</h4>
+                <p className="text-xs sm:text-sm text-brand-subtext leading-relaxed">{rev.comment}</p>
               </div>
             ))
           )}
@@ -643,20 +727,21 @@ export const ProductDetailPage: React.FC = () => {
       {/* Review Submission Modal */}
       {isReviewModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-6 relative border border-brand-muted shadow-2xl">
+          <div className="bg-white rounded-2xl sm:rounded-3xl max-w-lg w-full p-5 sm:p-8 space-y-4 sm:space-y-6 relative border border-brand-muted shadow-2xl">
             <button
+              type="button"
               onClick={() => setIsReviewModalOpen(false)}
-              className="absolute top-5 right-5 p-1 rounded-full text-brand-subtext hover:text-brand-dark"
+              className="absolute top-4 right-4 p-1 text-brand-subtext hover:text-brand-dark"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div>
-              <h3 className="font-serif text-xl font-bold text-brand-dark">Review {product.title}</h3>
-              <p className="text-xs text-brand-subtext mt-1">Share your honest feedback with our wellness community.</p>
+              <h3 className="font-serif text-lg sm:text-xl font-bold text-brand-dark">Review {product.title}</h3>
+              <p className="text-xs text-brand-subtext mt-0.5">Share your feedback with fellow wellness enthusiasts.</p>
             </div>
 
-            <form onSubmit={handleReviewSubmit} className="space-y-4">
+            <form onSubmit={handleReviewSubmit} className="space-y-3.5">
               <div>
                 <label className="text-xs font-semibold text-brand-dark block mb-1">Your Rating</label>
                 <div className="flex gap-2 text-amber-500">
@@ -667,7 +752,7 @@ export const ProductDetailPage: React.FC = () => {
                       onClick={() => setNewReviewRating(star)}
                       className="p-1 focus:outline-none"
                     >
-                      <Star className={`w-6 h-6 ${star <= newReviewRating ? 'fill-current' : 'text-gray-300'}`} />
+                      <Star className={`w-5 h-5 sm:w-6 sm:h-6 ${star <= newReviewRating ? 'fill-current' : 'text-gray-300'}`} />
                     </button>
                   ))}
                 </div>
@@ -681,108 +766,97 @@ export const ProductDetailPage: React.FC = () => {
                   value={newReviewName}
                   onChange={(e) => setNewReviewName(e.target.value)}
                   placeholder="e.g. Ananya S."
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-muted text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-muted text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-brand-dark block mb-1">Review Headline</label>
+                <label className="text-xs font-semibold text-brand-dark block mb-1">Headline</label>
                 <input
                   type="text"
                   required
                   value={newReviewTitle}
                   onChange={(e) => setNewReviewTitle(e.target.value)}
                   placeholder="e.g. Smooth texture and zero bloating!"
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-muted text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-muted text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-semibold text-brand-dark block mb-1">Detailed Review</label>
+                <label className="text-xs font-semibold text-brand-dark block mb-1">Your Review</label>
                 <textarea
                   required
-                  rows={4}
+                  rows={3}
                   value={newReviewComment}
                   onChange={(e) => setNewReviewComment(e.target.value)}
-                  placeholder="How was the digestion, taste, and solubility?"
-                  className="w-full px-4 py-2.5 rounded-xl border border-brand-muted text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
+                  placeholder="How was the taste and digestion?"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-muted text-sm text-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-primary/20"
                 />
               </div>
 
-              <button type="submit" className="w-full btn-primary !py-3 text-sm">
-                Submit Verified Review
+              <button type="submit" className="w-full btn-primary !py-3 text-xs sm:text-sm font-bold">
+                Submit Review
               </button>
             </form>
           </div>
         </div>
       )}
 
-      {/* Related Products Carousel */}
+      {/* Related Products: Two-column grid on mobile */}
       {relatedProducts.length > 0 && (
-        <section className="space-y-6">
-          <h3 className="font-serif text-2xl font-bold text-brand-dark">Pairs Well With</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {relatedProducts.slice(0, 3).map((p) => (
+        <section className="space-y-4 sm:space-y-6">
+          <h3 className="font-serif text-lg sm:text-2xl font-bold text-brand-dark">Pairs Well With</h3>
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+            {relatedProducts.slice(0, 4).map((p) => (
               <ProductCard key={p._id} product={p} />
             ))}
           </div>
         </section>
       )}
 
-      {/* Scrubsy Inspiration: Persistent Sticky Bottom ATC Bar on Scroll */}
-      {showStickyBar && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-brand-muted shadow-2xl py-3 px-4 sm:px-8 transition-all duration-300 animate-in slide-in-from-bottom">
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <img
-                src={selectedVariant.images[0]}
-                alt={product.title}
-                className="w-12 h-12 rounded-xl object-cover border border-brand-muted/80 flex-shrink-0"
-              />
-              <div className="min-w-0 hidden sm:block">
-                <p className="text-xs font-bold text-brand-dark truncate">{product.title}</p>
-                <p className="text-[11px] text-brand-subtext">
-                  {selectedVariant.flavor} • {selectedVariant.packSize} • {bundleTier === 'duo' ? 'Duo Pack (Free Shaker)' : bundleTier === 'trio' ? 'Trio Pack (20% OFF)' : 'Single Tub'}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="text-right">
-                <p className="text-base sm:text-lg font-bold text-brand-dark">
-                  ₹{bundleTier === 'duo'
-                    ? Math.round(selectedVariant.sellingPrice * 2 * 0.85)
-                    : bundleTier === 'trio'
-                    ? Math.round(selectedVariant.sellingPrice * 3 * 0.80)
-                    : selectedVariant.sellingPrice * quantity}
-                </p>
-                {selectedVariant.mrp > selectedVariant.sellingPrice && (
-                  <p className="text-[10px] text-brand-subtext line-through">
-                    ₹{selectedVariant.mrp * quantity}
-                  </p>
-                )}
-              </div>
-
-              <button
-                onClick={handleAddToCart}
-                disabled={isAdding || !selectedVariant.inStock}
-                className="btn-primary !py-2.5 !px-5 text-xs sm:text-sm gap-2 shadow-sm"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                <span>{isAdding ? 'Adding...' : 'Add to Bag'}</span>
-              </button>
-
-              <button
-                onClick={handleBuyNow}
-                disabled={!selectedVariant.inStock}
-                className="hidden md:inline-flex btn-secondary !py-2.5 !px-5 text-xs sm:text-sm font-semibold border-brand-primary text-brand-primary hover:bg-brand-glow/40"
-              >
-                Buy Now
-              </button>
+      {/* Sticky Bottom ATC Bar (Seamless mobile & desktop conversion bar) */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-lg border-t border-brand-muted/80 shadow-2xl py-2.5 sm:py-3.5 px-3 sm:px-8 pb-safe">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <img
+              src={selectedVariant.images[0]}
+              alt={product.title}
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl object-cover border border-brand-muted/80 flex-shrink-0"
+            />
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-bold text-brand-dark truncate max-w-[120px] sm:max-w-xs">{product.title}</p>
+              <p className="text-[10px] sm:text-[11px] text-brand-subtext truncate">
+                {selectedVariant.flavor} • ₹{bundleTier === 'duo'
+                  ? Math.round(selectedVariant.sellingPrice * 2 * 0.85)
+                  : bundleTier === 'trio'
+                  ? Math.round(selectedVariant.sellingPrice * 3 * 0.80)
+                  : selectedVariant.sellingPrice * quantity}
+              </p>
             </div>
           </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={isAdding || !selectedVariant.inStock}
+              className="btn-primary !py-2.5 !px-4 sm:!px-6 text-xs sm:text-sm gap-1.5 shadow-sm active:scale-95"
+            >
+              <ShoppingBag className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span>{isAdding ? 'Adding...' : 'Add to Bag'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleBuyNow}
+              disabled={!selectedVariant.inStock}
+              className="btn-secondary !py-2.5 !px-4 sm:!px-6 text-xs sm:text-sm font-bold border-brand-primary text-brand-primary active:scale-95"
+            >
+              Buy Now
+            </button>
+          </div>
         </div>
-      )}
+      </div>
 
     </div>
   );

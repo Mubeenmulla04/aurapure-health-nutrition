@@ -42,10 +42,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   return (
-    <div className="group relative bg-white rounded-3xl border border-brand-muted/70 p-4 transition-all duration-300 hover:shadow-card hover:border-brand-primary/20 flex flex-col justify-between">
+    <div className="group relative bg-white rounded-2xl sm:rounded-3xl border border-brand-muted/70 p-2.5 sm:p-4 transition-all duration-300 hover:shadow-card hover:border-brand-primary/20 flex flex-col justify-between">
       <div>
         {/* Image Container with Badges */}
-        <Link to={`/products/${product.slug}`} className="block relative aspect-[4/4] rounded-2xl overflow-hidden bg-brand-secondary/60 mb-4">
+        <Link to={`/products/${product.slug}`} className="block relative aspect-square rounded-xl sm:rounded-2xl overflow-hidden bg-brand-secondary/60 mb-2.5 sm:mb-4">
           <img
             src={selectedVariant?.images?.[0] || 'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?auto=format&fit=crop&w=600&q=80'}
             alt={product.title}
@@ -53,54 +53,54 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           />
 
           {/* Floating Badges */}
-          <div className="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
+          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex flex-col gap-1 items-start">
             {product.isBestSeller && (
-              <span className="px-2.5 py-1 rounded-full bg-brand-primary text-white text-[10px] font-bold tracking-wider uppercase shadow-sm">
+              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-brand-primary text-white text-[9px] sm:text-[10px] font-bold tracking-wider uppercase shadow-sm">
                 Best Seller
               </span>
             )}
             {selectedVariant?.discountPercent > 0 && (
-              <span className="px-2.5 py-1 rounded-full bg-brand-gold text-white text-[10px] font-bold tracking-wider uppercase shadow-sm">
+              <span className="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-brand-gold text-white text-[9px] sm:text-[10px] font-bold tracking-wider uppercase shadow-sm">
                 {selectedVariant.discountPercent}% OFF
               </span>
             )}
           </div>
 
-          {/* Wishlist Button */}
+          {/* Wishlist Button with accessible touch target */}
           <button
             type="button"
             onClick={handleWishlistToggle}
-            className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md transition-all ${
+            className={`absolute top-2 right-2 sm:top-3 sm:right-3 p-1.5 sm:p-2 rounded-full backdrop-blur-md transition-all active:scale-90 ${
               isWishlisted
                 ? 'bg-red-50 text-brand-error'
-                : 'bg-white/80 text-brand-subtext hover:text-brand-primary hover:bg-white'
+                : 'bg-white/80 text-brand-subtext hover:text-brand-primary hover:bg-white shadow-xs'
             }`}
-            aria-label="Wishlist"
+            aria-label="Save to Wishlist"
           >
-            <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
+            <Heart className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${isWishlisted ? 'fill-current' : ''}`} />
           </button>
         </Link>
 
         {/* Rating & Review Count */}
-        <div className="flex items-center gap-1.5 mb-1.5">
+        <div className="flex items-center gap-1 mb-1">
           <div className="flex items-center text-amber-500">
-            <Star className="w-3.5 h-3.5 fill-current" />
+            <Star className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
           </div>
-          <span className="text-xs font-bold text-brand-dark">{product.rating}</span>
-          <span className="text-[11px] text-brand-subtext">({product.reviewCount})</span>
+          <span className="text-[11px] sm:text-xs font-bold text-brand-dark">{product.rating}</span>
+          <span className="text-[10px] sm:text-[11px] text-brand-subtext">({product.reviewCount})</span>
         </div>
 
         {/* Product Title */}
         <Link to={`/products/${product.slug}`} className="block group-hover:text-brand-primary transition-colors">
-          <h3 className="font-serif text-base font-bold text-brand-dark leading-snug line-clamp-1">
+          <h3 className="font-serif text-xs sm:text-base font-bold text-brand-dark leading-tight line-clamp-2 min-h-[2rem] sm:min-h-[2.5rem]">
             {product.title}
           </h3>
-          <p className="text-xs text-brand-subtext mt-1 line-clamp-1">{product.subtitle}</p>
+          <p className="hidden sm:block text-xs text-brand-subtext mt-1 line-clamp-1">{product.subtitle}</p>
         </Link>
 
-        {/* Variant Flavor Selector Pills */}
+        {/* Variant Flavor Selector Pills (Compact on desktop) */}
         {product.variants && product.variants.length > 1 && (
-          <div className="flex flex-wrap gap-1.5 mt-3">
+          <div className="hidden sm:flex flex-wrap gap-1.5 mt-2.5">
             {product.variants.map((v, idx) => (
               <button
                 type="button"
@@ -124,16 +124,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       {/* Pricing & Add to Cart Action */}
-      <div className="mt-4 pt-3 border-t border-brand-muted/50 flex items-center justify-between">
-        <div>
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-base font-bold text-brand-dark">₹{selectedVariant?.sellingPrice}</span>
+      <div className="mt-2.5 sm:mt-4 pt-2 sm:pt-3 border-t border-brand-muted/50 flex items-center justify-between gap-1">
+        <div className="min-w-0">
+          <div className="flex items-baseline gap-1">
+            <span className="text-sm sm:text-base font-bold text-brand-dark">₹{selectedVariant?.sellingPrice}</span>
             {selectedVariant?.mrp > selectedVariant?.sellingPrice && (
-              <span className="text-xs text-brand-subtext line-through">₹{selectedVariant.mrp}</span>
+              <span className="text-[10px] sm:text-xs text-brand-subtext line-through">₹{selectedVariant.mrp}</span>
             )}
           </div>
-          <span className="text-[10px] text-brand-subtext block">
-            {selectedVariant?.packSize || 'Standard pack'}
+          <span className="text-[9px] sm:text-[10px] text-brand-subtext block truncate">
+            {selectedVariant?.packSize || '500g'}
           </span>
         </div>
 
@@ -141,18 +141,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           type="button"
           onClick={handleQuickAdd}
           disabled={isAdding || !selectedVariant?.inStock}
-          className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-all ${
+          className={`inline-flex items-center justify-center gap-1 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-[11px] sm:text-xs font-semibold transition-all active:scale-95 flex-shrink-0 ${
             addedSuccess
               ? 'bg-brand-sage text-white'
               : !selectedVariant?.inStock
               ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-              : 'bg-brand-primary text-white hover:bg-brand-primary-hover active:scale-95 shadow-subtle'
+              : 'bg-brand-primary text-white hover:bg-brand-primary-hover shadow-subtle'
           }`}
+          aria-label={`Add ${product.title} to bag`}
         >
           {addedSuccess ? (
             <>
               <Check className="w-3.5 h-3.5" />
-              <span>Added</span>
+              <span className="hidden xs:inline">Added</span>
             </>
           ) : !selectedVariant?.inStock ? (
             <span>Sold Out</span>

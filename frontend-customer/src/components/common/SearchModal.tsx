@@ -48,18 +48,18 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop */}
       <div
         onClick={onClose}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
       />
 
-      <div className="relative min-h-screen px-4 flex items-start justify-center pt-20">
-        <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-floating border border-brand-muted overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative h-full sm:h-auto sm:min-h-screen sm:p-4 sm:pt-20 flex sm:items-start sm:justify-center">
+        <div className="relative w-full h-full sm:h-auto sm:max-h-[85vh] sm:max-w-2xl bg-white sm:rounded-3xl shadow-floating sm:border sm:border-brand-muted flex flex-col overflow-hidden animate-in fade-in sm:zoom-in-95 duration-200">
           
           {/* Search Input Bar */}
-          <div className="p-4 sm:p-5 border-b border-brand-muted/70 flex items-center gap-3">
+          <div className="p-3.5 sm:p-5 border-b border-brand-muted/70 flex items-center gap-3 bg-white">
             <Search className="w-5 h-5 text-brand-primary flex-shrink-0" />
             <input
               ref={inputRef}
@@ -67,21 +67,22 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search plant protein, turmeric, superfoods..."
-              className="flex-1 bg-transparent text-base sm:text-lg text-brand-dark placeholder:text-brand-subtext/60 focus:outline-none"
+              className="flex-1 bg-transparent text-base text-brand-dark placeholder:text-brand-subtext/60 focus:outline-none"
             />
             {isLoading && <Loader2 className="w-5 h-5 text-brand-subtext animate-spin" />}
             <button
               onClick={onClose}
-              className="p-1.5 rounded-full hover:bg-brand-bg text-brand-subtext hover:text-brand-dark transition-colors"
+              className="w-10 h-10 rounded-full hover:bg-brand-bg text-brand-subtext hover:text-brand-dark transition-colors flex items-center justify-center -mr-1"
+              aria-label="Close search"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Results List */}
-          <div className="max-h-[60vh] overflow-y-auto p-4 sm:p-6 divide-y divide-brand-muted/50">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 divide-y divide-brand-muted/50 pb-safe">
             {query.trim().length >= 2 && results.length === 0 && !isLoading && (
-              <div className="py-8 text-center text-brand-subtext text-sm">
+              <div className="py-12 text-center text-brand-subtext text-sm">
                 No products found matching "{query}". Try searching for "Protein", "Chocolate", or "Turmeric".
               </div>
             )}
@@ -97,9 +98,9 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                     onClose();
                     navigate(`/products/${product.slug}`);
                   }}
-                  className="py-3 px-3 rounded-xl hover:bg-brand-bg flex items-center gap-4 cursor-pointer transition-colors group"
+                  className="py-3 px-2 sm:px-3 rounded-xl hover:bg-brand-bg flex items-center gap-3.5 cursor-pointer transition-colors group"
                 >
-                  <div className="w-16 h-16 rounded-lg bg-brand-secondary overflow-hidden flex-shrink-0">
+                  <div className="w-16 h-16 rounded-xl bg-brand-secondary overflow-hidden flex-shrink-0 border border-brand-muted/40">
                     <img src={defaultImage} alt={product.title} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -107,7 +108,7 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
                       {product.title}
                     </h4>
                     <p className="text-xs text-brand-subtext truncate mt-0.5">{product.subtitle}</p>
-                    <span className="inline-block text-xs font-bold text-brand-dark mt-1">From ₹{lowestPrice}</span>
+                    <span className="inline-block text-xs font-bold text-brand-primary mt-1">From ₹{lowestPrice}</span>
                   </div>
                   <ArrowRight className="w-4 h-4 text-brand-subtext group-hover:text-brand-primary group-hover:translate-x-1 transition-all" />
                 </div>
@@ -117,14 +118,14 @@ export const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => 
             {/* Quick Popular Tags */}
             {query.trim().length < 2 && (
               <div className="py-4 space-y-3">
-                <p className="text-xs font-semibold uppercase tracking-wider text-brand-subtext">Popular Searches</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-brand-subtext">Popular Searches</p>
                 <div className="flex flex-wrap gap-2">
                   {['Belgian Chocolate Protein', 'Raw Unflavored', 'Madagascar Vanilla', 'Turmeric Latte', 'Daily Greens'].map(
                     (tag) => (
                       <button
                         key={tag}
                         onClick={() => setQuery(tag)}
-                        className="px-3 py-1.5 rounded-full bg-brand-secondary text-xs font-medium text-brand-dark hover:bg-brand-muted transition-colors"
+                        className="px-3.5 py-2 rounded-full bg-brand-secondary text-xs font-semibold text-brand-dark hover:bg-brand-muted transition-colors border border-brand-muted/50"
                       >
                         {tag}
                       </button>

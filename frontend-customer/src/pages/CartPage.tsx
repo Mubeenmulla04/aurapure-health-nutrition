@@ -72,31 +72,65 @@ export const CartPage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Cart Line Items Table */}
-        <div className="lg:col-span-8 bg-white rounded-3xl border border-brand-muted/80 divide-y divide-brand-muted/60 overflow-hidden">
+        <div className="lg:col-span-8 bg-white rounded-3xl border border-brand-muted/80 divide-y divide-brand-muted/60 overflow-hidden shadow-subtle">
           {cart.items.map((item) => (
-            <div key={item.variantId} className="p-6 flex flex-col sm:flex-row gap-6 items-center">
-              <div className="w-24 h-24 rounded-2xl bg-brand-secondary/60 overflow-hidden flex-shrink-0">
+            <div key={item.variantId} className="p-4 sm:p-6 flex gap-3.5 sm:gap-6 items-start sm:items-center">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-brand-secondary/60 overflow-hidden flex-shrink-0 border border-brand-muted/40">
                 <img src={item.image} alt={item.productTitle} className="w-full h-full object-cover" />
               </div>
 
-              <div className="flex-1 space-y-1 text-center sm:text-left">
-                <Link
-                  to={`/products/${item.productSlug}`}
-                  className="font-serif text-base font-bold text-brand-dark hover:text-brand-primary transition-colors"
-                >
-                  {item.productTitle}
-                </Link>
-                <p className="text-xs text-brand-subtext">
+              <div className="flex-1 min-w-0 space-y-1">
+                <div className="flex justify-between items-start gap-2">
+                  <Link
+                    to={`/products/${item.productSlug}`}
+                    className="font-serif text-sm sm:text-base font-bold text-brand-dark hover:text-brand-primary transition-colors line-clamp-1"
+                  >
+                    {item.productTitle}
+                  </Link>
+                  <button
+                    onClick={() => removeItem(item.variantId)}
+                    className="w-8 h-8 -mr-1.5 -mt-1 flex sm:hidden items-center justify-center rounded-full text-brand-subtext hover:text-brand-error"
+                    aria-label="Remove item"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <p className="text-[11px] sm:text-xs text-brand-subtext">
                   {item.flavor} • {item.packSize}
                 </p>
-                <div className="text-xs font-semibold text-brand-primary pt-1">₹{item.unitPrice} each</div>
+                <div className="text-xs font-semibold text-brand-primary pt-0.5">₹{item.unitPrice} each</div>
+
+                {/* Mobile Stepper & Price in same row */}
+                <div className="flex sm:hidden items-center justify-between pt-2">
+                  <div className="flex items-center border border-brand-muted rounded-full bg-brand-bg">
+                    <button
+                      onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
+                      className="w-8 h-8 flex items-center justify-center text-brand-subtext hover:text-brand-dark"
+                      aria-label="Decrease quantity"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="w-6 text-center text-xs font-bold text-brand-dark">{item.quantity}</span>
+                    <button
+                      onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
+                      className="w-8 h-8 flex items-center justify-center text-brand-subtext hover:text-brand-dark"
+                      aria-label="Increase quantity"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  <span className="text-sm font-bold text-brand-dark">₹{item.total}</span>
+                </div>
               </div>
 
-              {/* Quantity Stepper */}
-              <div className="flex items-center border border-brand-muted rounded-full bg-brand-bg px-2">
+              {/* Desktop Stepper */}
+              <div className="hidden sm:flex items-center border border-brand-muted rounded-full bg-brand-bg px-2">
                 <button
                   onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
                   className="p-2 text-brand-subtext hover:text-brand-dark"
+                  aria-label="Decrease quantity"
                 >
                   <Minus className="w-3.5 h-3.5" />
                 </button>
@@ -104,17 +138,18 @@ export const CartPage: React.FC = () => {
                 <button
                   onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
                   className="p-2 text-brand-subtext hover:text-brand-dark"
+                  aria-label="Increase quantity"
                 >
                   <Plus className="w-3.5 h-3.5" />
                 </button>
               </div>
 
-              {/* Line Total & Remove */}
-              <div className="flex items-center gap-4">
+              {/* Desktop Line Total & Remove */}
+              <div className="hidden sm:flex items-center gap-4">
                 <span className="text-base font-bold text-brand-dark min-w-[70px] text-right">₹{item.total}</span>
                 <button
                   onClick={() => removeItem(item.variantId)}
-                  className="p-2 text-brand-subtext hover:text-brand-error transition-colors"
+                  className="w-9 h-9 rounded-full flex items-center justify-center text-brand-subtext hover:text-brand-error hover:bg-red-50 transition-colors"
                   aria-label="Remove item"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -144,22 +179,48 @@ export const CartPage: React.FC = () => {
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleApplyCoupon} className="flex gap-2">
-                  <input
-                    type="text"
-                    value={couponInput}
-                    onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
-                    placeholder="Enter code (e.g. AURAPURE10)"
-                    className="flex-1 px-3.5 py-2 rounded-xl bg-brand-bg border border-brand-muted text-xs uppercase font-semibold text-brand-dark focus:outline-none focus:ring-1 focus:ring-brand-primary"
-                  />
-                  <button
-                    type="submit"
-                    disabled={isApplying || !couponInput.trim()}
-                    className="btn-primary !px-4 !py-2 !text-xs"
-                  >
-                    Apply
-                  </button>
-                </form>
+                <div className="space-y-2">
+                  <form onSubmit={handleApplyCoupon} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                      placeholder="Enter code"
+                      className="flex-1 px-3.5 py-2.5 rounded-xl bg-brand-bg border border-brand-muted text-xs uppercase font-semibold text-brand-dark focus:outline-none focus:ring-1 focus:ring-brand-primary"
+                    />
+                    <button
+                      type="submit"
+                      disabled={isApplying || !couponInput.trim()}
+                      className="btn-primary !px-4 !py-2.5 !text-xs"
+                    >
+                      Apply
+                    </button>
+                  </form>
+                  {/* Quick-tap coupon tags */}
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    <span className="text-[10px] text-brand-subtext">Quick Apply:</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCouponInput('AURAPURE10');
+                        applyCoupon('AURAPURE10');
+                      }}
+                      className="px-2.5 py-1 rounded-full bg-brand-secondary hover:bg-brand-muted text-[10px] font-bold text-brand-primary transition-colors border border-brand-muted/60"
+                    >
+                      AURAPURE10 (10% OFF)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCouponInput('WELCOME200');
+                        applyCoupon('WELCOME200');
+                      }}
+                      className="px-2.5 py-1 rounded-full bg-brand-secondary hover:bg-brand-muted text-[10px] font-bold text-brand-primary transition-colors border border-brand-muted/60"
+                    >
+                      WELCOME200 (₹200 OFF)
+                    </button>
+                  </div>
+                </div>
               )}
 
               {couponError && (
@@ -205,6 +266,21 @@ export const CartPage: React.FC = () => {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Sticky Mobile Checkout Bar */}
+      <div className="fixed bottom-16 left-0 right-0 p-3.5 bg-white/95 backdrop-blur-md border-t border-brand-muted/80 shadow-floating sm:hidden z-30 flex items-center justify-between gap-4">
+        <div>
+          <span className="text-[10px] text-brand-subtext block uppercase font-medium">Payable Total</span>
+          <span className="text-base font-bold text-brand-primary">₹{cart.finalTotal}</span>
+        </div>
+        <button
+          onClick={() => navigate('/checkout')}
+          className="btn-primary !py-3 !px-6 !text-xs font-semibold gap-2 shadow-card"
+        >
+          <span>Checkout</span>
+          <ArrowRight className="w-3.5 h-3.5" />
+        </button>
       </div>
     </div>
   );
