@@ -1,6 +1,7 @@
 import { Cart, ICart } from '../../models/cart.model.js';
 import { ProductVariant } from '../../models/productVariant.model.js';
 import { Product } from '../../models/product.model.js';
+import { Inventory } from '../../models/inventory.model.js';
 import { CouponService } from '../coupons/coupon.service.js';
 import { CurrencyUtils } from '../../utils/currency.js';
 
@@ -13,7 +14,7 @@ export class CartService {
 
     if (userId) {
       cart = await Cart.findOne({ userId });
-      // If user had a guest cart before logging in, merge it
+      // If user had a guest cart before logging in, safely merge it into user cart
       if (guestSessionId) {
         const guestCart = await Cart.findOne({ guestSessionId });
         if (guestCart && guestCart.items.length > 0) {
@@ -23,7 +24,7 @@ export class CartService {
             await guestCart.save();
             cart = guestCart;
           } else {
-            // Merge items
+            // Safely merge items without duplicates
             for (const item of guestCart.items) {
               const existing = cart.items.find((i) => i.variantId.toString() === item.variantId.toString());
               if (existing) {
@@ -62,6 +63,13 @@ export class CartService {
       throw { statusCode: 404, code: 'VARIANT_NOT_FOUND', message: 'Product variant not found or unavailable.' };
     }
 
+    // Backend Inventory & Stock Availability Check
+    const inv = await Inventory.findOne({ variantId });
+    const availableStock = inv ? inv.availableStock : 100;
+    if (availableStock <= 0) {
+      throw { statusCode: 400, code: 'OUT_OF_STOCK', message: 'This formulation variant is currently out of stock.' };
+    }
+
     let cart = await Cart.findOne(
       params.userId ? { userId: params.userId } : { guestSessionId: params.guestSessionId }
     );
@@ -75,12 +83,23 @@ export class CartService {
     }
 
     const existingIndex = cart.items.findIndex((item) => item.variantId.toString() === variantId);
+    const currentQty = existingIndex > -1 ? cart.items[existingIndex].quantity : 0;
+    const requestedQty = Math.max(1, quantity);
+
+    if (currentQty + requestedQty > availableStock) {
+      throw {
+        statusCode: 400,
+        code: 'INSUFFICIENT_STOCK',
+        message: `Only ${availableStock} units available in stock. You currently have ${currentQty} in your bag.`,
+      };
+    }
+
     if (existingIndex > -1) {
-      cart.items[existingIndex].quantity += Math.max(1, quantity);
+      cart.items[existingIndex].quantity += requestedQty;
     } else {
       cart.items.push({
         variantId: variant._id as any,
-        quantity: Math.max(1, quantity),
+        quantity: requestedQty,
         addedAt: new Date(),
       });
     }
@@ -105,6 +124,17 @@ export class CartService {
     if (quantity <= 0) {
       cart.items = cart.items.filter((item) => item.variantId.toString() !== variantId) as any;
     } else {
+      // Backend Stock Validation
+      const inv = await Inventory.findOne({ variantId });
+      const availableStock = inv ? inv.availableStock : 100;
+      if (quantity > availableStock) {
+        throw {
+          statusCode: 400,
+          code: 'INSUFFICIENT_STOCK',
+          message: `Only ${availableStock} units available in stock.`,
+        };
+      }
+
       const item = cart.items.find((i) => i.variantId.toString() === variantId);
       if (item) {
         item.quantity = quantity;
@@ -154,7 +184,8 @@ export class CartService {
   }
 
   /**
-   * Recalculates all line items with live DB prices and computes authoritative financial totals
+   * Recalculates all line items with live DB prices and computes authoritative financial totals.
+   * Frontend submitted prices/totals are never trusted.
    */
   static async calculateCartTotals(cart: ICart, userId?: string) {
     let subtotal = 0;
@@ -165,7 +196,18 @@ export class CartService {
       if (variant && variant.isActive) {
         const product = await Product.findById(variant.productId);
         if (product && product.isActive) {
-          const lineTotal = variant.sellingPrice * item.quantity;
+          const inv = await Inventory.findOne({ variantId: variant._id });
+          const availableStock = inv ? inv.availableStock : 100;
+          
+          // Cap quantity to available stock if warehouse inventory decreased
+          let quantity = item.quantity;
+          if (availableStock > 0 && quantity > availableStock) {
+            quantity = availableStock;
+            item.quantity = quantity;
+            await cart.save();
+          }
+
+          const lineTotal = variant.sellingPrice * quantity;
           subtotal += lineTotal;
 
           enrichedItems.push({
@@ -179,8 +221,10 @@ export class CartService {
             image: variant.images[0] || '',
             unitPrice: variant.sellingPrice,
             mrp: variant.mrp,
-            quantity: item.quantity,
+            quantity,
             total: lineTotal,
+            availableStock,
+            inStock: availableStock > 0,
           });
         }
       }

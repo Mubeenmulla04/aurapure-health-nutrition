@@ -57,7 +57,7 @@ export class ReviewController {
       const review = await Review.create({
         productId,
         userId,
-        userName: userName || req.user?.email.split('@')[0] || 'AuraPure Member',
+        userName: userName || (req.user?.email ? req.user.email.split('@')[0] : 'AuraPure Member'),
         rating: Math.min(5, Math.max(1, Number(rating))),
         title,
         comment,

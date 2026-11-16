@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import { Product, IProduct } from '../../models/product.model.js';
 import { ProductVariant } from '../../models/productVariant.model.js';
 import { Category } from '../../models/category.model.js';
@@ -140,7 +141,12 @@ export class ProductService {
   }
 
   static async getProductBySlug(slug: string) {
-    const product = await Product.findOne({ slug: slug.toLowerCase(), isActive: true }).populate(
+    const isObjectId = mongoose.Types.ObjectId.isValid(slug);
+    const query = isObjectId
+      ? { $or: [{ slug: slug.toLowerCase() }, { _id: slug }], isActive: true }
+      : { slug: slug.toLowerCase(), isActive: true };
+
+    const product = await Product.findOne(query).populate(
       'categoryId',
       'name slug badge'
     );

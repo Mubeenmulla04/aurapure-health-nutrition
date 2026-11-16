@@ -7,7 +7,16 @@ export interface IInventoryTransaction extends Document {
   changeQuantity: number;
   previousQuantity: number;
   newQuantity: number;
-  type: 'ORDER_HOLD' | 'PURCHASE_COMMIT' | 'ORDER_CANCELLED_RESTOCK' | 'MANUAL_RESTOCK' | 'DAMAGED_DISCARD';
+  type:
+    | 'ORDER_HOLD'
+    | 'PURCHASE_COMMIT'
+    | 'ORDER_CANCELLED_RESTOCK'
+    | 'MANUAL_RESTOCK'
+    | 'DAMAGED_DISCARD'
+    | 'PURCHASE_RECEIPT'
+    | 'CYCLE_COUNT'
+    | 'MANUAL_ADJUSTMENT'
+    | 'RETURN_RESTOCK';
   reason?: string;
   performedBy?: Types.ObjectId;
   createdAt: Date;
@@ -46,7 +55,17 @@ const InventoryTransactionSchema = new Schema<IInventoryTransaction>(
     },
     type: {
       type: String,
-      enum: ['ORDER_HOLD', 'PURCHASE_COMMIT', 'ORDER_CANCELLED_RESTOCK', 'MANUAL_RESTOCK', 'DAMAGED_DISCARD'],
+      enum: [
+        'ORDER_HOLD',
+        'PURCHASE_COMMIT',
+        'ORDER_CANCELLED_RESTOCK',
+        'MANUAL_RESTOCK',
+        'DAMAGED_DISCARD',
+        'PURCHASE_RECEIPT',
+        'CYCLE_COUNT',
+        'MANUAL_ADJUSTMENT',
+        'RETURN_RESTOCK',
+      ],
       required: true,
       index: true,
     },

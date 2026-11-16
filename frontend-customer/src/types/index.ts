@@ -1,12 +1,17 @@
 export interface User {
   id: string;
-  name: string;
-  email: string;
+  name?: string;
+  fullName?: string;
+  email?: string;
   phone?: string;
-  role: 'customer' | 'admin' | 'inventory_manager' | 'support';
-  isEmailVerified: boolean;
-  isPhoneVerified: boolean;
-  createdAt: string;
+  mobileNumber?: string;
+  countryCode?: string;
+  role: string;
+  isMobileVerified?: boolean;
+  isEmailVerified?: boolean;
+  isProfileComplete?: boolean;
+  addressCount?: number;
+  createdAt?: string;
 }
 
 export interface Address {
@@ -14,12 +19,16 @@ export interface Address {
   id?: string;
   fullName: string;
   phone: string;
+  houseFlatNo?: string;
+  apartmentBuilding?: string;
+  streetArea?: string;
   addressLine1: string;
   addressLine2?: string;
   landmark?: string;
   city: string;
   state: string;
   pincode: string;
+  country?: string;
   isDefaultShipping?: boolean;
   isDefaultBilling?: boolean;
 }
@@ -112,28 +121,79 @@ export interface OrderItem {
   image: string;
 }
 
+export interface OrderTimelineItem {
+  status: string;
+  timestamp: string;
+  note?: string;
+  source?: string;
+  location?: string;
+  authorName?: string;
+}
+
+export interface ShipmentDetails {
+  awbCode?: string;
+  awbNumber?: string;
+  courierName?: string;
+  trackingUrl?: string;
+  currentStatus?: string;
+  estimatedDeliveryDate?: string;
+  actualDeliveryDate?: string;
+  trackingHistory?: {
+    status: string;
+    activity: string;
+    location?: string;
+    timestamp: string;
+  }[];
+}
+
 export interface Order {
   _id: string;
   orderNumber: string;
   createdAt: string;
-  orderStatus: 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'CANCELLED';
+  orderStatus:
+    | 'PENDING'
+    | 'CONFIRMED'
+    | 'PROCESSING'
+    | 'PACKED'
+    | 'READY_TO_SHIP'
+    | 'SHIPPED'
+    | 'IN_TRANSIT'
+    | 'OUT_FOR_DELIVERY'
+    | 'DELIVERED'
+    | 'SHIPMENT_DELAYED'
+    | 'DELIVERY_FAILED'
+    | 'RETURN_REQUESTED'
+    | 'RETURNED'
+    | 'CANCELLED'
+    | 'REFUNDED';
   paymentStatus: 'UNPAID' | 'PAID' | 'FAILED' | 'REFUNDED';
-  paymentMethod: 'RAZORPAY_UPI' | 'RAZORPAY_CARD' | 'RAZORPAY_NETBANKING';
+  paymentMethod: 'SHIPROCKET' | 'RAZORPAY' | 'COD' | 'RAZORPAY_UPI' | 'RAZORPAY_CARD' | 'RAZORPAY_NETBANKING' | string;
   items: OrderItem[];
   shippingAddress: Address;
+  customerSnapshot?: {
+    fullName: string;
+    email: string;
+    phone: string;
+  };
   pricing: {
     subtotal: number;
+    couponCode?: string;
     couponDiscount: number;
     shippingFee: number;
     taxGst: number;
     finalTotal: number;
   };
-  tracking?: {
-    awbCode?: string;
+  shipment?: ShipmentDetails;
+  shipmentDetails?: {
     courierName?: string;
+    awbNumber?: string;
     trackingUrl?: string;
-    currentStatus?: string;
+    dispatchedAt?: string;
+    deliveredAt?: string;
   };
+  tracking?: ShipmentDetails;
+  orderTimeline?: OrderTimelineItem[];
+  cancellationReason?: string;
   invoiceUrl?: string;
 }
 

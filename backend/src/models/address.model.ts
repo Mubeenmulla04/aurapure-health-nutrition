@@ -4,12 +4,16 @@ export interface IAddress extends Document {
   userId?: Types.ObjectId;
   fullName: string;
   phone: string;
+  houseFlatNo?: string;
+  apartmentBuilding?: string;
+  streetArea?: string;
   addressLine1: string;
   addressLine2?: string;
   landmark?: string;
   city: string;
   state: string;
   pincode: string;
+  country: string;
   isDefaultShipping: boolean;
   isDefaultBilling: boolean;
   createdAt: Date;
@@ -31,6 +35,18 @@ const AddressSchema = new Schema<IAddress>(
     phone: {
       type: String,
       required: true,
+      trim: true,
+    },
+    houseFlatNo: {
+      type: String,
+      trim: true,
+    },
+    apartmentBuilding: {
+      type: String,
+      trim: true,
+    },
+    streetArea: {
+      type: String,
       trim: true,
     },
     addressLine1: {
@@ -61,6 +77,11 @@ const AddressSchema = new Schema<IAddress>(
       required: true,
       trim: true,
       index: true,
+    },
+    country: {
+      type: String,
+      default: 'India',
+      trim: true,
     },
     isDefaultShipping: {
       type: Boolean,

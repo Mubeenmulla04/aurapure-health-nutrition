@@ -1,7 +1,17 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
+export type RoleType =
+  | 'super_admin'
+  | 'admin'
+  | 'order_manager'
+  | 'product_manager'
+  | 'inventory_manager'
+  | 'support_manager'
+  | 'marketing_manager'
+  | 'customer';
+
 export interface IRole extends Document {
-  name: 'customer' | 'admin' | 'inventory_manager' | 'support';
+  name: RoleType;
   description: string;
   permissions: string[];
   createdAt: Date;
@@ -14,7 +24,16 @@ const RoleSchema = new Schema<IRole>(
       type: String,
       required: true,
       unique: true,
-      enum: ['customer', 'admin', 'inventory_manager', 'support'],
+      enum: [
+        'super_admin',
+        'admin',
+        'order_manager',
+        'product_manager',
+        'inventory_manager',
+        'support_manager',
+        'marketing_manager',
+        'customer',
+      ],
     },
     description: {
       type: String,

@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { TokenUtils, TokenPayload } from '../utils/tokens.js';
 import { ApiResponse } from '../utils/apiResponse.js';
+import { UserSession } from '../models/userSession.model.js';
 
 // Extend Express Request type
 declare global {
@@ -27,6 +28,14 @@ export const authenticate = (req: Request, res: Response, next: NextFunction): v
     const token = authHeader.split(' ')[1];
     const payload = TokenUtils.verifyAccessToken(token);
     req.user = payload;
+
+    // Asynchronously touch lastActivityAt for inactivity tracking
+    if (payload.sessionId) {
+      UserSession.updateOne({ _id: payload.sessionId, isRevoked: false }, { $set: { lastActivityAt: new Date() } })
+        .exec()
+        .catch(() => {});
+    }
+
     next();
   } catch (error: any) {
     ApiResponse.error({

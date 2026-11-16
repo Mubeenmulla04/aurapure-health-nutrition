@@ -21,18 +21,18 @@ export class OrderController {
 
   static async createOrder(req: Request, res: Response, next: NextFunction) {
     try {
-      const { shippingAddress, guestEmail, guestPhone } = req.body;
+      const { shippingAddress, guestEmail, guestPhone, paymentMethod = 'RAZORPAY' } = req.body;
       const params = {
         ...OrderController.getParams(req),
         guestEmail,
         guestPhone,
       };
 
-      const result = await OrderService.createOrder(params, shippingAddress);
+      const result = await OrderService.createOrder(params, shippingAddress, paymentMethod.toUpperCase() as 'RAZORPAY' | 'COD');
       ApiResponse.success({
         res,
         statusCode: 201,
-        message: 'Order created in PENDING status.',
+        message: paymentMethod.toUpperCase() === 'COD' ? 'Order confirmed via Cash on Delivery.' : 'Order created in PENDING status.',
         data: result,
       });
     } catch (error) {
@@ -46,6 +46,32 @@ export class OrderController {
       ApiResponse.success({
         res,
         message: 'Payment verified and order confirmed successfully.',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async verifyShiprocketPayment(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await OrderService.verifyShiprocketPayment(req.body);
+      ApiResponse.success({
+        res,
+        message: 'Shiprocket payment verified and order confirmed successfully.',
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async handleShiprocketWebhook(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await OrderService.handleShiprocketWebhook(req.body, req.headers);
+      ApiResponse.success({
+        res,
+        message: result.message || 'Shiprocket webhook processed.',
         data: result,
       });
     } catch (error) {
@@ -69,7 +95,9 @@ export class OrderController {
 
   static async getOrderById(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await OrderService.getOrderById(req.params.id as string);
+      const userId = req.user?.userId;
+      const userRole = req.user?.role;
+      const result = await OrderService.getOrderById(req.params.id as string, userId, userRole);
       ApiResponse.success({ res, data: result });
     } catch (error) {
       next(error);
@@ -79,7 +107,9 @@ export class OrderController {
   static async cancelOrder(req: Request, res: Response, next: NextFunction) {
     try {
       const { reason } = req.body;
-      const order = await OrderService.cancelOrder(req.params.id as string, reason);
+      const userId = req.user?.userId;
+      const userRole = req.user?.role;
+      const order = await OrderService.cancelOrder(req.params.id as string, reason, userId, userRole);
       ApiResponse.success({ res, message: 'Order cancelled and inventory restocked.', data: { order } });
     } catch (error) {
       next(error);
@@ -89,7 +119,11 @@ export class OrderController {
   static async trackOrder(req: Request, res: Response, next: NextFunction) {
     try {
       const { orderNumber, phoneOrEmail } = req.query;
-      const result = await OrderService.trackOrderByNumber(orderNumber as string, phoneOrEmail as string);
+      const result = await OrderService.trackOrderByNumber(
+        orderNumber as string,
+        phoneOrEmail as string,
+        req.user?.userId
+      );
       ApiResponse.success({ res, data: result });
     } catch (error) {
       next(error);

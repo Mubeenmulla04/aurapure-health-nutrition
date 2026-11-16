@@ -8,7 +8,6 @@ import { AnnouncementBar } from './components/common/AnnouncementBar';
 import { Navbar } from './components/common/Navbar';
 import { BottomNav } from './components/common/BottomNav';
 import { Footer } from './components/common/Footer';
-import { CartDrawer } from './components/common/CartDrawer';
 import { SearchModal } from './components/common/SearchModal';
 
 import { HomePage } from './pages/HomePage';
@@ -76,8 +75,10 @@ export const App: React.FC = () => {
                   <Route path="/pages/shipping-policy" element={<ShippingPolicyPage />} />
                   <Route path="/pages/refund-policy" element={<RefundPolicyPage />} />
                   <Route path="/pages/privacy-policy" element={<PrivacyPolicyPage />} />
+                  <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                   <Route path="/pages/terms" element={<TermsPage />} />
                   <Route path="/terms" element={<TermsPage />} />
+                  <Route path="/terms-and-conditions" element={<TermsPage />} />
                   <Route path="/pages/faqs" element={<FaqsPage />} />
                   <Route path="/faqs" element={<FaqsPage />} />
 
@@ -87,7 +88,6 @@ export const App: React.FC = () => {
               </main>
 
               <Footer />
-              <CartDrawer />
               <BottomNav onOpenSearch={() => setIsSearchOpen(true)} />
               <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
             </div>

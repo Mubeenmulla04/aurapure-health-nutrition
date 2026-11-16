@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { CheckCircle2, Download, MessageSquare, ArrowRight, Package, Home } from 'lucide-react';
-import { api } from '../services/api';
+import { api, API_BASE_URL } from '../services/api';
 import { Order } from '../types';
 
 export const OrderConfirmationPage: React.FC = () => {
@@ -61,7 +61,13 @@ export const OrderConfirmationPage: React.FC = () => {
         {/* Download Invoice Action */}
         <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
           <a
-            href={invoiceUrl ? `http://localhost:5000${invoiceUrl}` : '#'}
+            href={
+              invoiceUrl
+                ? invoiceUrl.startsWith('http')
+                  ? invoiceUrl
+                  : `${API_BASE_URL.replace(/\/api\/v1\/?$/, '')}${invoiceUrl}`
+                : '#'
+            }
             target="_blank"
             rel="noreferrer"
             className="btn-primary gap-2 !py-3 !px-6 text-xs shadow-subtle"

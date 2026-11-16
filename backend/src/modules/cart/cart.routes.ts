@@ -11,6 +11,7 @@ router.post('/items', CartController.addItem);
 router.put('/items/:variantId', CartController.updateQuantity);
 router.delete('/items/:variantId', CartController.removeItem);
 router.post('/apply-coupon', CartController.applyCoupon);
+router.post('/remove-coupon', CartController.removeCoupon);
 router.delete('/remove-coupon', CartController.removeCoupon);
 
 export const cartRoutes = router;

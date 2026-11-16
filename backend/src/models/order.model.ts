@@ -17,12 +17,23 @@ export interface IOrderItemSnapshot {
 export interface IAddressSnapshot {
   fullName: string;
   phone: string;
+  houseFlatNo?: string;
+  apartmentBuilding?: string;
+  streetArea?: string;
   addressLine1: string;
   addressLine2?: string;
   landmark?: string;
   city: string;
   state: string;
   pincode: string;
+  country?: string;
+}
+
+export interface ICustomerSnapshot {
+  fullName: string;
+  email: string;
+  phone: string;
+  userId?: Types.ObjectId;
 }
 
 export interface IPricingSnapshot {
@@ -34,28 +45,76 @@ export interface IPricingSnapshot {
   finalTotal: number;
 }
 
+export type OrderStatusType =
+  | 'PENDING'
+  | 'CONFIRMED'
+  | 'PROCESSING'
+  | 'PACKED'
+  | 'READY_TO_SHIP'
+  | 'SHIPPED'
+  | 'IN_TRANSIT'
+  | 'OUT_FOR_DELIVERY'
+  | 'DELIVERED'
+  | 'SHIPMENT_DELAYED'
+  | 'DELIVERY_FAILED'
+  | 'RETURN_REQUESTED'
+  | 'RETURNED'
+  | 'CANCELLED'
+  | 'REFUNDED';
+
+export interface IShipmentDetailsSnapshot {
+  courierName?: string;
+  courierCompanyId?: number;
+  awbNumber?: string;
+  trackingUrl?: string;
+  labelUrl?: string;
+  manifestUrl?: string;
+  pickupTokenNumber?: string;
+  shiprocketOrderId?: string;
+  shiprocketShipmentId?: string;
+  packageWeight?: number;
+  dispatchedAt?: Date;
+  deliveredAt?: Date;
+}
+
+export interface IOrderTimelineItem {
+  status: string;
+  timestamp: Date;
+  note: string;
+  source?: 'ADMIN' | 'SHIPROCKET_WEBHOOK' | 'SYSTEM' | 'CUSTOMER';
+  updatedBy?: Types.ObjectId;
+  authorName?: string;
+  location?: string;
+}
+
 export interface IOrder extends Document {
   orderNumber: string;
   userId?: Types.ObjectId;
   guestEmail?: string;
   guestPhone?: string;
+  customerSnapshot?: ICustomerSnapshot;
   items: IOrderItemSnapshot[];
   shippingAddress: IAddressSnapshot;
   billingAddress?: IAddressSnapshot;
   pricing: IPricingSnapshot;
-  orderStatus:
-    | 'PENDING'
-    | 'CONFIRMED'
-    | 'PROCESSING'
+  orderStatus: OrderStatusType;
+  fulfillmentStage?:
+    | 'NEW_ORDER'
+    | 'ACCEPTED'
+    | 'LABEL_READY'
+    | 'READY_FOR_PICKUP'
     | 'SHIPPED'
+    | 'IN_TRANSIT'
     | 'OUT_FOR_DELIVERY'
     | 'DELIVERED'
-    | 'CANCELLED'
-    | 'REFUNDED';
+    | 'EXCEPTION'
+    | 'CANCELLED';
   paymentStatus: 'UNPAID' | 'PAID' | 'FAILED' | 'REFUNDED';
-  paymentMethod: 'RAZORPAY' | 'COD';
+  paymentMethod: 'SHIPROCKET' | 'RAZORPAY' | 'COD';
   cancellationReason?: string;
   notes?: string;
+  shipmentDetails?: IShipmentDetailsSnapshot;
+  orderTimeline: IOrderTimelineItem[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -81,12 +140,26 @@ const AddressSnapshotSchema = new Schema<IAddressSnapshot>(
   {
     fullName: { type: String, required: true },
     phone: { type: String, required: true },
+    houseFlatNo: String,
+    apartmentBuilding: String,
+    streetArea: String,
     addressLine1: { type: String, required: true },
     addressLine2: String,
     landmark: String,
     city: { type: String, required: true },
     state: { type: String, required: true },
     pincode: { type: String, required: true },
+    country: { type: String, default: 'India' },
+  },
+  { _id: false }
+);
+
+const CustomerSnapshotSchema = new Schema<ICustomerSnapshot>(
+  {
+    fullName: { type: String, required: true },
+    email: { type: String, default: '' },
+    phone: { type: String, required: true },
+    userId: { type: Schema.Types.ObjectId, ref: 'User' },
   },
   { _id: false }
 );
@@ -128,6 +201,9 @@ const OrderSchema = new Schema<IOrder>(
       trim: true,
       sparse: true,
     },
+    customerSnapshot: {
+      type: CustomerSnapshotSchema,
+    },
     items: {
       type: [OrderItemSnapshotSchema],
       required: true,
@@ -150,13 +226,37 @@ const OrderSchema = new Schema<IOrder>(
         'PENDING',
         'CONFIRMED',
         'PROCESSING',
+        'PACKED',
+        'READY_TO_SHIP',
         'SHIPPED',
+        'IN_TRANSIT',
         'OUT_FOR_DELIVERY',
         'DELIVERED',
+        'SHIPMENT_DELAYED',
+        'DELIVERY_FAILED',
+        'RETURN_REQUESTED',
+        'RETURNED',
         'CANCELLED',
         'REFUNDED',
       ],
       default: 'PENDING',
+      index: true,
+    },
+    fulfillmentStage: {
+      type: String,
+      enum: [
+        'NEW_ORDER',
+        'ACCEPTED',
+        'LABEL_READY',
+        'READY_FOR_PICKUP',
+        'SHIPPED',
+        'IN_TRANSIT',
+        'OUT_FOR_DELIVERY',
+        'DELIVERED',
+        'EXCEPTION',
+        'CANCELLED',
+      ],
+      default: 'NEW_ORDER',
       index: true,
     },
     paymentStatus: {
@@ -167,11 +267,40 @@ const OrderSchema = new Schema<IOrder>(
     },
     paymentMethod: {
       type: String,
-      enum: ['RAZORPAY', 'COD'],
-      default: 'RAZORPAY',
+      enum: ['SHIPROCKET', 'RAZORPAY', 'COD'],
+      default: 'SHIPROCKET',
     },
     cancellationReason: String,
     notes: String,
+    shipmentDetails: {
+      courierName: String,
+      courierCompanyId: Number,
+      awbNumber: String,
+      trackingUrl: String,
+      labelUrl: String,
+      manifestUrl: String,
+      pickupTokenNumber: String,
+      shiprocketOrderId: String,
+      shiprocketShipmentId: String,
+      packageWeight: Number,
+      dispatchedAt: Date,
+      deliveredAt: Date,
+    },
+    orderTimeline: [
+      {
+        status: { type: String, required: true },
+        timestamp: { type: Date, default: Date.now },
+        note: { type: String, default: '' },
+        source: {
+          type: String,
+          enum: ['ADMIN', 'SHIPROCKET_WEBHOOK', 'SYSTEM', 'CUSTOMER'],
+          default: 'SYSTEM',
+        },
+        location: String,
+        updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+        authorName: String,
+      },
+    ],
   },
   { timestamps: true }
 );

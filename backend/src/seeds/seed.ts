@@ -12,6 +12,8 @@ import {
   Banner,
   FAQ,
   Review,
+  StoreSettings,
+  Slide,
 } from '../models/index.js';
 import { logger } from '../utils/logger.js';
 
@@ -39,43 +41,72 @@ export async function seedDatabase() {
     await Banner.deleteMany({});
     await FAQ.deleteMany({});
     await Review.deleteMany({});
+    await Slide.deleteMany({});
 
     logger.info('Purged existing seedable collections.');
 
-    // 1. Roles
+    // 1. Roles (Expanded 7 Staff Roles + Customer)
     const roles = await Role.insertMany([
-      { name: 'admin', description: 'Full system administration', permissions: ['*'] },
-      { name: 'customer', description: 'Standard customer role', permissions: ['order:create', 'order:read_self'] },
-      { name: 'inventory_manager', description: 'Inventory and stock operations', permissions: ['inventory:*'] },
-      { name: 'support', description: 'Customer support representative', permissions: ['order:read', 'ticket:*'] },
+      { name: 'super_admin', description: 'Full system administration & staff governance', permissions: ['*'] },
+      { name: 'admin', description: 'Full business operations access', permissions: ['*'] },
+      {
+        name: 'order_manager',
+        description: 'Order fulfillment, shipments, and invoices',
+        permissions: ['orders:read', 'orders:write', 'shipping:write', 'invoices:read'],
+      },
+      {
+        name: 'product_manager',
+        description: 'Products, categories, and catalog taxonomy',
+        permissions: ['products:read', 'products:write', 'products:delete', 'categories:read', 'categories:write', 'banners:write'],
+      },
+      {
+        name: 'inventory_manager',
+        description: 'Stock levels and warehouse audit adjustments',
+        permissions: ['inventory:read', 'inventory:write'],
+      },
+      {
+        name: 'support_manager',
+        description: 'Customer profiles, inquiries, and reviews moderation',
+        permissions: ['customers:read', 'orders:read', 'reviews:write', 'refunds:write'],
+      },
+      {
+        name: 'marketing_manager',
+        description: 'Coupons, promotions, and campaign banners',
+        permissions: ['coupons:read', 'coupons:write', 'banners:write', 'reports:export'],
+      },
+      { name: 'customer', description: 'Standard customer account', permissions: ['order:create', 'order:read_self'] },
     ]);
 
-    const adminRole = roles.find((r) => r.name === 'admin');
+    const superAdminRole = roles.find((r) => r.name === 'super_admin');
     const customerRole = roles.find((r) => r.name === 'customer');
 
-    // 2. Users (Admin + Demo Customer)
-    const salt = await bcrypt.genSalt(10);
-    const adminPasswordHash = await bcrypt.hash('Admin@AuraPure2026', salt);
-    const customerPasswordHash = await bcrypt.hash('Customer@2026', salt);
-
+    // 2. Users (Super Admin + Demo Customer with Mobile Numbers)
     const adminUser = await User.create({
       name: 'Dr. Siddharth Sen (Admin)',
+      fullName: 'Dr. Siddharth Sen (Admin)',
+      mobileNumber: '9876543210',
+      countryCode: '+91',
+      phone: '9876543210',
       email: 'admin@aurapure.in',
-      phone: '+919876543210',
-      passwordHash: adminPasswordHash,
-      role: 'admin',
-      roleId: adminRole?._id,
+      role: 'super_admin',
+      roleId: superAdminRole?._id,
+      isActive: true,
+      isMobileVerified: true,
       isEmailVerified: true,
       isPhoneVerified: true,
     });
 
     const demoCustomer = await User.create({
       name: 'Ananya Sharma',
+      fullName: 'Ananya Sharma',
+      mobileNumber: '9811223344',
+      countryCode: '+91',
+      phone: '9811223344',
       email: 'customer@aurapure.in',
-      phone: '+919811223344',
-      passwordHash: customerPasswordHash,
       role: 'customer',
       roleId: customerRole?._id,
+      isActive: true,
+      isMobileVerified: true,
       isEmailVerified: true,
       isPhoneVerified: true,
     });
@@ -575,6 +606,104 @@ export async function seedDatabase() {
         verifiedPurchase: true,
         isApproved: true,
         helpfulVotes: 18,
+      },
+    ]);
+
+    // 10. Store Settings Initialization
+    await StoreSettings.deleteMany({});
+    await StoreSettings.create({
+      storeName: 'AuraPure Nutrition',
+      legalEntityName: 'AuraPure Bio-Wellness Private Limited',
+      gstin: '29AABCA1234F1Z5',
+      supportEmail: 'support@aurapure.in',
+      supportPhone: '+91 80 4920 1800',
+      supportWhatsApp: '+91 98765 43210',
+      registeredAddress: {
+        line1: '108 Bio-Valley Tech Park, Whitefield',
+        line2: 'Phase 2, EPIP Zone',
+        city: 'Bengaluru',
+        state: 'Karnataka',
+        pincode: '560066',
+        country: 'India',
+      },
+      currency: {
+        code: 'INR',
+        symbol: '₹',
+      },
+      taxation: {
+        defaultGstPercent: 18,
+        pricesInclusiveOfGst: true,
+      },
+      shipping: {
+        freeShippingThreshold: 999,
+        standardShippingFee: 99,
+        estimatedMetroDays: 2,
+        estimatedRestDays: 5,
+      },
+      invoice: {
+        prefix: 'AP-INV-',
+        nextNumber: 1001,
+        termsAndConditions:
+          'Thank you for choosing AuraPure Nutrition. Goods once sold are subject to our 14-day plant-purity guarantee. For queries or batch test certificates, email support@aurapure.in.',
+      },
+      integrations: {
+        razorpayConfigured: true,
+        shiprocketConfigured: true,
+        whatsappConfigured: true,
+        smtpConfigured: true,
+      },
+      seoDefaults: {
+        metaTitle: 'AuraPure Nutrition — 100% Organic Plant-Based Protein & Ayurvedic Wellness',
+        metaDescription:
+          'Shop clean, lab-tested organic plant protein powders, Ayurvedic supplements, and daily nutrition formulated for Indian wellness.',
+        metaKeywords: ['organic protein', 'plant protein india', 'ayurvedic wellness', 'vegan protein powder'],
+      },
+      updatedBy: adminUser._id,
+    });
+
+    // 11. Initial Promotional Slides for Homepage Slideshow
+    await Slide.insertMany([
+      {
+        title: 'Clean Plant Protein Launch',
+        heading: 'Pure Plant Power. Zero Compromise.',
+        subtitle:
+          'Cold-pressed organic plant protein with papain & bromelain enzymes plus KSM-66 Ashwagandha. 100% gentle on Indian stomachs.',
+        desktopImage: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1920&q=80',
+        mobileImage: 'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?auto=format&fit=crop&w=800&q=80',
+        imageAltText: 'AuraPure Organic Plant Protein Powder',
+        ctaText: 'Shop Clean Proteins',
+        ctaLink: '/collections/plant-protein-powder',
+        badgeText: 'Zero Bloat Guarantee • 25g Pure Protein',
+        displayOrder: 0,
+        isActive: true,
+      },
+      {
+        title: 'Daily Super Greens & Detox',
+        heading: 'Daily Cellular Reset. Feel The Vitality.',
+        subtitle:
+          'Organic Moringa, Spirulina, Chlorella & Wheatgrass sourced directly from certified organic farms across India.',
+        desktopImage: 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=1920&q=80',
+        mobileImage: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=800&q=80',
+        imageAltText: 'AuraPure Daily Greens & Superfoods',
+        ctaText: 'Explore Superfoods',
+        ctaLink: '/collections/superfoods-greens',
+        badgeText: '30+ Alkalizing Whole Greens',
+        displayOrder: 1,
+        isActive: true,
+      },
+      {
+        title: 'Golden Turmeric Super-Elixir',
+        heading: 'Ayurvedic Restorative Elixir.',
+        subtitle:
+          '7.5% Natural Curcumin blended with organic Ceylon cinnamon and BioPerine piperine for maximum cellular absorption.',
+        desktopImage: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=1920&q=80',
+        mobileImage: 'https://images.unsplash.com/photo-1615485290382-441e4d049cb5?auto=format&fit=crop&w=800&q=80',
+        imageAltText: 'AuraPure Ayurvedic Golden Turmeric',
+        ctaText: 'Discover Daily Wellness',
+        ctaLink: '/collections/daily-wellness',
+        badgeText: 'High-Curcumin Lakadong Turmeric',
+        displayOrder: 2,
+        isActive: true,
       },
     ]);
 

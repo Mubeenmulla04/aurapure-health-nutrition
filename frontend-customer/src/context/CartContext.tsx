@@ -1,22 +1,27 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { api } from '../services/api';
+import { useAuth } from './AuthContext';
+
+export interface CartItemData {
+  variantId: string;
+  productId: string;
+  productTitle: string;
+  productSlug: string;
+  flavor: string;
+  packSize: string;
+  sku: string;
+  image: string;
+  unitPrice: number;
+  mrp: number;
+  quantity: number;
+  total: number;
+  availableStock?: number;
+  inStock?: boolean;
+}
 
 export interface CartData {
   cartId?: string;
-  items: {
-    variantId: string;
-    productId: string;
-    productTitle: string;
-    productSlug: string;
-    flavor: string;
-    packSize: string;
-    sku: string;
-    image: string;
-    unitPrice: number;
-    mrp: number;
-    quantity: number;
-    total: number;
-  }[];
+  items: CartItemData[];
   totalItemsCount: number;
   subtotal: number;
   couponDiscount: number;
@@ -40,7 +45,7 @@ interface CartContextType {
   isCartDrawerOpen: boolean;
   openCartDrawer: () => void;
   closeCartDrawer: () => void;
-  addItem: (variantId: string, quantity?: number) => Promise<void>;
+  addItem: (variantId: string, quantity?: number, openDrawer?: boolean) => Promise<void>;
   updateQuantity: (variantId: string, quantity: number) => Promise<void>;
   removeItem: (variantId: string) => Promise<void>;
   applyCoupon: (code: string) => Promise<void>;
@@ -68,7 +73,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartData>(defaultCart);
   const [isLoading, setIsLoading] = useState(false);
-  const [isCartDrawerOpen, setIsCartDrawerOpen] = useState(false);
+  const { user } = useAuth();
 
   const refreshCart = useCallback(async () => {
     try {
@@ -78,26 +83,27 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCart(res.data.data.cart);
       }
     } catch {
-      // Fallback empty cart
+      // Fallback: keep previous or default
     } finally {
       setIsLoading(false);
     }
   }, []);
 
+  // Sync cart whenever authentication status changes (OTP login or logout)
   useEffect(() => {
     refreshCart();
-  }, [refreshCart]);
+  }, [user, refreshCart]);
 
-  const addItem = async (variantId: string, quantity: number = 1) => {
+  const addItem = async (variantId: string, quantity: number = 1, _openDrawer: boolean = false) => {
     try {
       setIsLoading(true);
       const res = await api.post('/cart/items', { variantId, quantity });
       if (res.data?.data?.cart) {
         setCart(res.data.data.cart);
-        setIsCartDrawerOpen(true);
       }
     } catch (err: any) {
-      alert(err.response?.data?.error?.message || 'Failed to add item to cart.');
+      const msg = err.response?.data?.error?.message || err.message || 'Failed to add item to bag.';
+      throw new Error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -110,6 +116,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (res.data?.data?.cart) {
         setCart(res.data.data.cart);
       }
+    } catch (err: any) {
+      const msg = err.response?.data?.error?.message || err.message || 'Failed to update quantity.';
+      throw new Error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -122,6 +131,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (res.data?.data?.cart) {
         setCart(res.data.data.cart);
       }
+    } catch (err: any) {
+      const msg = err.response?.data?.error?.message || err.message || 'Failed to remove item.';
+      throw new Error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -135,7 +147,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCart(res.data.data.cart);
       }
     } catch (err: any) {
-      throw new Error(err.response?.data?.error?.message || 'Invalid coupon code');
+      const msg = err.response?.data?.error?.message || err.message || 'Invalid coupon code';
+      throw new Error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -148,6 +161,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (res.data?.data?.cart) {
         setCart(res.data.data.cart);
       }
+    } catch (err: any) {
+      const msg = err.response?.data?.error?.message || err.message || 'Failed to remove coupon.';
+      throw new Error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -158,9 +174,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         cart,
         isLoading,
-        isCartDrawerOpen,
-        openCartDrawer: () => setIsCartDrawerOpen(true),
-        closeCartDrawer: () => setIsCartDrawerOpen(false),
+        isCartDrawerOpen: false,
+        openCartDrawer: () => {},
+        closeCartDrawer: () => {},
         addItem,
         updateQuantity,
         removeItem,

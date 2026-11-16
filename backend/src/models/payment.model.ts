@@ -2,8 +2,14 @@ import mongoose, { Document, Schema, Types } from 'mongoose';
 
 export interface IPayment extends Document {
   orderId: Types.ObjectId;
-  gateway: 'RAZORPAY';
-  razorpayOrderId: string;
+  gateway: 'SHIPROCKET' | 'RAZORPAY';
+  gatewayOrderId?: string;
+  gatewayPaymentId?: string;
+  gatewaySignature?: string;
+  shiprocketOrderId?: string;
+  shiprocketPaymentId?: string;
+  shiprocketToken?: string;
+  razorpayOrderId?: string;
   razorpayPaymentId?: string;
   razorpaySignature?: string;
   amount: number; // in paise
@@ -27,12 +33,39 @@ const PaymentSchema = new Schema<IPayment>(
     },
     gateway: {
       type: String,
-      default: 'RAZORPAY',
+      enum: ['SHIPROCKET', 'RAZORPAY'],
+      default: 'SHIPROCKET',
+      index: true,
+    },
+    gatewayOrderId: {
+      type: String,
+      sparse: true,
+      index: true,
+    },
+    gatewayPaymentId: {
+      type: String,
+      sparse: true,
+      index: true,
+    },
+    gatewaySignature: {
+      type: String,
+    },
+    shiprocketOrderId: {
+      type: String,
+      sparse: true,
+      index: true,
+    },
+    shiprocketPaymentId: {
+      type: String,
+      sparse: true,
+      index: true,
+    },
+    shiprocketToken: {
+      type: String,
     },
     razorpayOrderId: {
       type: String,
-      required: true,
-      unique: true,
+      sparse: true,
       index: true,
     },
     razorpayPaymentId: {

@@ -20,3 +20,8 @@ export * from './notification.model.js';
 export * from './banner.model.js';
 export * from './faq.model.js';
 export * from './auditLog.model.js';
+export * from './storeSettings.model.js';
+export * from './otpChallenge.model.js';
+export * from './userSession.model.js';
+export * from './authAuditLog.model.js';
+export * from './slide.model.js';

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search, ShoppingBag, Heart, User as UserIcon, Menu, X, ChevronDown, Sparkles } from 'lucide-react';
+import { Search, ShoppingBag, Heart, User as UserIcon, Menu, X, ChevronDown, Sparkles, LogOut } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 import { useAuth } from '../../context/AuthContext';
 import { useWishlist } from '../../context/WishlistContext';
@@ -11,7 +12,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
   const navigate = useNavigate();
-  const { cart, openCartDrawer } = useCart();
+  const { cart } = useCart();
   const { user, isAuthenticated, logout } = useAuth();
   const { wishlistIds } = useWishlist();
 
@@ -62,6 +63,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
 
           {/* Desktop Navigation Links & Mega Menu */}
           <nav className="hidden lg:flex items-center space-x-8">
+            <Link
+              to="/"
+              className="text-sm font-medium text-brand-dark hover:text-brand-primary transition-colors"
+            >
+              Home
+            </Link>
+
             <div
               className="relative py-4"
               onMouseEnter={() => setIsMegaMenuOpen(true)}
@@ -148,13 +156,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
             >
               Our Philosophy
             </Link>
-
-            <Link
-              to="/track-order"
-              className="text-sm font-medium text-brand-dark hover:text-brand-primary transition-colors"
-            >
-              Track Order
-            </Link>
           </nav>
 
           {/* Right Action Icons */}
@@ -206,16 +207,30 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
                       <Link
                         to="/account/profile"
                         onClick={() => setIsUserMenuOpen(false)}
-                        className="block px-4 py-2 text-sm text-brand-dark hover:bg-brand-bg"
+                        className="block px-4 py-2 text-sm text-brand-dark hover:bg-brand-bg transition-colors"
                       >
-                        Profile & Addresses
+                        My Profile
+                      </Link>
+                      <Link
+                        to="/account/addresses"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-brand-dark hover:bg-brand-bg transition-colors"
+                      >
+                        My Addresses
                       </Link>
                       <Link
                         to="/account/orders"
                         onClick={() => setIsUserMenuOpen(false)}
-                        className="block px-4 py-2 text-sm text-brand-dark hover:bg-brand-bg"
+                        className="block px-4 py-2 text-sm text-brand-dark hover:bg-brand-bg transition-colors"
                       >
-                        Order History
+                        My Orders
+                      </Link>
+                      <Link
+                        to="/account/wishlist"
+                        onClick={() => setIsUserMenuOpen(false)}
+                        className="block px-4 py-2 text-sm text-brand-dark hover:bg-brand-bg transition-colors"
+                      >
+                        Wishlist ({wishlistIds.length})
                       </Link>
                       {user?.role === 'admin' && (
                         <a
@@ -254,142 +269,205 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSearch }) => {
               )}
             </div>
 
-            {/* Shopping Cart Bag */}
-            <button
-              type="button"
-              onClick={openCartDrawer}
+            {/* Shopping Cart Bag (Navigates to /cart directly) */}
+            <Link
+              to="/cart"
               className="inline-flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full bg-brand-primary text-white text-xs font-semibold hover:bg-brand-primary-hover transition-all active:scale-95 shadow-subtle"
-              aria-label="Shopping Cart"
+              aria-label="Shopping Cart Bag"
             >
               <ShoppingBag className="w-4 h-4" />
               <span>{cart.totalItemsCount}</span>
-            </button>
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Native-feel Mobile Drawer Menu Modal */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
+      {/* Native-feel Mobile Drawer Menu Modal (Portaled directly to document.body) */}
+      {isMobileMenuOpen &&
+        createPortal(
+          <div className="fixed inset-0 z-[100] lg:hidden">
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
 
-          {/* Drawer content */}
-          <div className="fixed inset-y-0 left-0 max-w-xs w-full bg-white shadow-2xl p-6 flex flex-col justify-between z-10 animate-in slide-in-from-left duration-250">
-            <div className="space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-brand-muted/70">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-brand-glow flex items-center justify-center">
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 text-brand-primary fill-current">
-                      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
-                    </svg>
+            {/* Full-Height Drawer content */}
+            <div className="fixed inset-y-0 left-0 w-[82vw] max-w-xs h-[100dvh] bg-white shadow-2xl p-5 sm:p-6 flex flex-col justify-between z-10 overflow-y-auto pb-safe">
+              <div className="space-y-5">
+                <div className="flex items-center justify-between pb-4 border-b border-brand-muted/70">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full bg-brand-glow flex items-center justify-center">
+                      <svg viewBox="0 0 24 24" className="w-4 h-4 text-brand-primary fill-current">
+                        <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <span className="font-serif text-lg font-bold text-brand-dark block">AuraPure</span>
+                      <span className="text-[9px] uppercase tracking-wider text-brand-subtext font-semibold -mt-1 block">
+                        Clean Nutrition
+                      </span>
+                    </div>
                   </div>
-                  <span className="font-serif text-lg font-bold text-brand-dark">AuraPure</span>
+                  <button
+                    type="button"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-9 h-9 rounded-full hover:bg-brand-bg flex items-center justify-center text-brand-subtext hover:text-brand-dark transition-colors"
+                    aria-label="Close menu"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="p-2 -mr-2 text-brand-subtext hover:text-brand-dark active:scale-95"
-                  aria-label="Close menu"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
 
-              {/* Navigation Links */}
-              <div className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-brand-subtext px-2">
-                  Explore Collections
-                </span>
-                <Link
-                  to="/collections"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-brand-dark hover:bg-brand-bg transition-colors"
-                >
-                  <span>All Products</span>
-                  <span className="text-xs text-brand-primary font-bold">Browse →</span>
-                </Link>
-                <Link
-                  to="/collections/plant-protein-powder"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-brand-dark hover:bg-brand-bg transition-colors"
-                >
-                  <span>🌿 Plant Protein Powders</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold">
-                    Best Seller
+                {/* User Status Bar inside Mobile Sidebar */}
+                <div className="p-3 rounded-2xl bg-brand-secondary/60 border border-brand-muted/60">
+                  {isAuthenticated ? (
+                    <div className="flex items-center justify-between">
+                      <div className="truncate">
+                        <span className="text-xs font-bold text-brand-dark block truncate">Hi, {user?.name}</span>
+                        <Link
+                          to="/account"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="text-[11px] text-brand-primary font-semibold hover:underline"
+                        >
+                          View Account & Orders →
+                        </Link>
+                      </div>
+                      <button
+                        onClick={() => {
+                          logout();
+                          setIsMobileMenuOpen(false);
+                          navigate('/');
+                        }}
+                        className="p-1.5 text-brand-subtext hover:text-brand-error"
+                        title="Sign Out"
+                      >
+                        <LogOut className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-xs font-bold text-brand-dark block">Welcome to AuraPure</span>
+                        <span className="text-[11px] text-brand-subtext">Access orders & wellness perks</span>
+                      </div>
+                      <Link
+                        to="/account/login"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="btn-primary !py-1.5 !px-3 !text-[11px]"
+                      >
+                        Sign In
+                      </Link>
+                    </div>
+                  )}
+                </div>
+
+                {/* Navigation Links */}
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-brand-subtext px-2">
+                    Explore Collections
                   </span>
-                </Link>
-                <Link
-                  to="/collections/daily-wellness"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-brand-dark hover:bg-brand-bg transition-colors"
-                >
-                  <span>☀️ Daily Wellness & Turmeric</span>
-                </Link>
-                <Link
-                  to="/collections/superfoods-greens"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold text-brand-dark hover:bg-brand-bg transition-colors"
-                >
-                  <span>🥗 Greens & Superfoods</span>
-                </Link>
+                  <Link
+                    to="/"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-brand-dark hover:bg-brand-bg transition-colors"
+                  >
+                    <span>Home</span>
+                  </Link>
+                  <Link
+                    to="/collections"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-brand-dark hover:bg-brand-bg transition-colors"
+                  >
+                    <span>All Formulations</span>
+                    <span className="text-[11px] text-brand-primary font-bold">Browse →</span>
+                  </Link>
+                  <Link
+                    to="/collections/plant-protein-powder"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-brand-dark hover:bg-brand-bg transition-colors"
+                  >
+                    <span>🌿 Plant Protein Powders</span>
+                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold">
+                      Best Seller
+                    </span>
+                  </Link>
+                  <Link
+                    to="/collections/daily-wellness"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-brand-dark hover:bg-brand-bg transition-colors"
+                  >
+                    <span>☀️ Daily Wellness & Turmeric</span>
+                  </Link>
+                  <Link
+                    to="/collections/superfoods-greens"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-brand-dark hover:bg-brand-bg transition-colors"
+                  >
+                    <span>🥗 Greens & Superfoods</span>
+                  </Link>
+                  <Link
+                    to="/collections/gut-health"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-brand-dark hover:bg-brand-bg transition-colors"
+                  >
+                    <span>✨ Gut Health & Digestion</span>
+                  </Link>
+                </div>
+
+                {/* Company & Support */}
+                <div className="space-y-1 pt-3 border-t border-brand-muted/60">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-brand-subtext px-2">
+                    About & Support
+                  </span>
+                  <Link
+                    to="/pages/about"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block px-3 py-2 rounded-xl text-xs font-medium text-brand-dark hover:bg-brand-bg"
+                  >
+                    Our Clean Philosophy
+                  </Link>
+                  <Link
+                    to="/account/wishlist"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block px-3 py-2 rounded-xl text-xs font-medium text-brand-dark hover:bg-brand-bg"
+                  >
+                    My Wishlist ({wishlistIds.length})
+                  </Link>
+                  <Link
+                    to="/pages/faqs"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block px-3 py-2 rounded-xl text-xs font-medium text-brand-dark hover:bg-brand-bg"
+                  >
+                    Help Center & FAQs
+                  </Link>
+                  <Link
+                    to="/pages/contact"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block px-3 py-2 rounded-xl text-xs font-medium text-brand-dark hover:bg-brand-bg"
+                  >
+                    Contact Us
+                  </Link>
+                </div>
               </div>
 
-              {/* Company & Support */}
-              <div className="space-y-1 pt-3 border-t border-brand-muted/60">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-brand-subtext px-2">
-                  About & Support
-                </span>
-                <Link
-                  to="/pages/about"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-xl text-sm text-brand-dark hover:bg-brand-bg"
+              {/* Footer WhatsApp pill inside drawer */}
+              <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs space-y-1 mt-4">
+                <p className="font-semibold text-emerald-950 text-xs">Customer Support Concierge</p>
+                <p className="text-emerald-800 text-[11px]">Instant answers via official WhatsApp</p>
+                <a
+                  href="https://wa.me/919876543210"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-block font-bold text-emerald-700 mt-1 text-xs hover:underline"
                 >
-                  Our Clean Philosophy
-                </Link>
-                <Link
-                  to="/track-order"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-xl text-sm text-brand-dark hover:bg-brand-bg"
-                >
-                  Track Your Order
-                </Link>
-                <Link
-                  to="/pages/faqs"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-xl text-sm text-brand-dark hover:bg-brand-bg"
-                >
-                  Help Center & FAQs
-                </Link>
-                <Link
-                  to="/pages/contact"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block px-3 py-2 rounded-xl text-sm text-brand-dark hover:bg-brand-bg"
-                >
-                  Contact Support
-                </Link>
+                  Chat with an Expert ↗
+                </a>
               </div>
             </div>
-
-            {/* Footer Support pill inside drawer */}
-            <div className="p-3.5 rounded-2xl bg-brand-bg border border-brand-muted/80 text-xs space-y-1">
-              <p className="font-semibold text-brand-dark">Need assistance?</p>
-              <p className="text-brand-subtext text-[11px]">Direct WhatsApp support available Mon-Sat</p>
-              <a
-                href="https://wa.me/919876543210"
-                target="_blank"
-                rel="noreferrer"
-                className="inline-block font-bold text-brand-primary mt-1 text-xs"
-              >
-                Chat on WhatsApp ↗
-              </a>
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </header>
   );
 };

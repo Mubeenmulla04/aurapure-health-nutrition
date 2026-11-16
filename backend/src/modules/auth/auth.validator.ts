@@ -1,33 +1,57 @@
 import { z } from 'zod';
 
-export const registerSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters long').max(60),
-  email: z.string().email('Please enter a valid email address'),
-  phone: z
+export const sendOtpSchema = z.object({
+  mobileNumber: z
     .string()
-    .regex(/^[6-9]\d{9}$/, 'Please enter a valid 10-digit Indian mobile number')
-    .optional(),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters long')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number'),
+    .trim()
+    .regex(/^[6-9]\d{9}$/, 'Please enter a valid 10-digit Indian mobile number starting with 6-9'),
+  countryCode: z.string().trim().default('+91'),
 });
 
-export const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(1, 'Password is required'),
-});
-
-export const forgotPasswordSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-});
-
-export const resetPasswordSchema = z.object({
-  token: z.string().min(1, 'Reset token is required'),
-  newPassword: z
+export const verifyOtpSchema = z.object({
+  mobileNumber: z
     .string()
-    .min(8, 'Password must be at least 8 characters long')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number'),
+    .trim()
+    .regex(/^[6-9]\d{9}$/, 'Please enter a valid 10-digit Indian mobile number'),
+  otp: z
+    .string()
+    .trim()
+    .length(6, 'Verification code must be exactly 6 digits')
+    .regex(/^\d{6}$/, 'OTP must contain numbers only'),
+  countryCode: z.string().trim().default('+91'),
+});
+
+export const resendOtpSchema = z.object({
+  mobileNumber: z
+    .string()
+    .trim()
+    .regex(/^[6-9]\d{9}$/, 'Please enter a valid 10-digit Indian mobile number'),
+  countryCode: z.string().trim().default('+91'),
+});
+
+export const changeMobileVerifyOldSchema = z.object({
+  otp: z
+    .string()
+    .trim()
+    .length(6, 'Verification code must be exactly 6 digits')
+    .regex(/^\d{6}$/, 'OTP must contain numbers only'),
+});
+
+export const changeMobileVerifyNewSchema = z.object({
+  newMobileNumber: z
+    .string()
+    .trim()
+    .regex(/^[6-9]\d{9}$/, 'Please enter a valid 10-digit Indian mobile number'),
+  otp: z
+    .string()
+    .trim()
+    .length(6, 'Verification code must be exactly 6 digits')
+    .regex(/^\d{6}$/, 'OTP must contain numbers only'),
+  changeToken: z.string().min(10, 'Invalid or expired authorization challenge token'),
+});
+
+export const updateProfileSchema = z.object({
+  name: z.string().trim().min(2, 'Name must be at least 2 characters').optional(),
+  fullName: z.string().trim().min(2).optional(),
+  email: z.string().trim().email('Invalid email address').optional(),
 });

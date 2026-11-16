@@ -119,4 +119,36 @@ export class WhatsAppIntegrationService {
       userId: order.userId?.toString(),
     });
   }
+
+  /**
+   * Helper: Send Generic Order Status Update
+   */
+  static async sendOrderStatusNotification(
+    order: any,
+    newStatus: string,
+    trackingInfo?: { courierName?: string; awbNumber?: string; trackingUrl?: string; location?: string }
+  ) {
+    const trackingLink = trackingInfo?.trackingUrl || `${env.CLIENT_URL}/account/orders`;
+    const courier = trackingInfo?.courierName || 'Courier Partner';
+    const awb = trackingInfo?.awbNumber || 'In Transit';
+
+    if (newStatus === 'SHIPPED') {
+      return this.sendShippingUpdate(order, courier, awb, trackingLink);
+    }
+
+    return this.sendTemplate({
+      toPhone: order.shippingAddress.phone,
+      templateName: `order_${newStatus.toLowerCase()}`,
+      parameters: [
+        { type: 'text', text: order.shippingAddress.fullName || 'Customer' },
+        { type: 'text', text: order.orderNumber },
+        { type: 'text', text: newStatus.replace(/_/g, ' ') },
+        { type: 'text', text: courier },
+        { type: 'text', text: awb },
+        { type: 'text', text: trackingLink },
+      ],
+      orderId: order._id.toString(),
+      userId: order.userId?.toString(),
+    });
+  }
 }

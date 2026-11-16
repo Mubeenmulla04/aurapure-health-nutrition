@@ -1,33 +1,53 @@
 import mongoose, { Document, Schema, Types } from 'mongoose';
+import { RoleType } from './role.model.js';
 
 export interface IUser extends Document {
-  name: string;
-  email: string;
+  mobileNumber: string;
+  countryCode: string;
+  name?: string;
+  fullName?: string;
+  email?: string;
   phone?: string;
   passwordHash?: string;
-  role: 'customer' | 'admin' | 'inventory_manager' | 'support';
+  role: RoleType;
   roleId?: Types.ObjectId;
+  isActive: boolean;
+  isMobileVerified: boolean;
   isEmailVerified: boolean;
   isPhoneVerified: boolean;
   refreshTokenHash?: string;
-  passwordResetToken?: string;
-  passwordResetExpires?: Date;
   lastLoginAt?: Date;
+  lastActivityAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
 
 const UserSchema = new Schema<IUser>(
   {
-    name: {
+    mobileNumber: {
       type: String,
       required: true,
+      trim: true,
+      index: true,
+    },
+    countryCode: {
+      type: String,
+      required: true,
+      default: '+91',
+      trim: true,
+    },
+    name: {
+      type: String,
+      trim: true,
+      default: 'Customer',
+    },
+    fullName: {
+      type: String,
       trim: true,
     },
     email: {
       type: String,
-      required: true,
-      unique: true,
+      sparse: true,
       lowercase: true,
       trim: true,
       index: true,
@@ -40,17 +60,35 @@ const UserSchema = new Schema<IUser>(
     },
     passwordHash: {
       type: String,
-      select: false, // Hidden by default from queries
+      select: false,
     },
     role: {
       type: String,
-      enum: ['customer', 'admin', 'inventory_manager', 'support'],
+      enum: [
+        'super_admin',
+        'admin',
+        'order_manager',
+        'product_manager',
+        'inventory_manager',
+        'support_manager',
+        'marketing_manager',
+        'customer',
+      ],
       default: 'customer',
       index: true,
     },
     roleId: {
       type: Schema.Types.ObjectId,
       ref: 'Role',
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    isMobileVerified: {
+      type: Boolean,
+      default: false,
+      index: true,
     },
     isEmailVerified: {
       type: Boolean,
@@ -64,19 +102,32 @@ const UserSchema = new Schema<IUser>(
       type: String,
       select: false,
     },
-    passwordResetToken: {
-      type: String,
-      select: false,
-    },
-    passwordResetExpires: {
-      type: Date,
-      select: false,
-    },
     lastLoginAt: {
       type: Date,
+    },
+    lastActivityAt: {
+      type: Date,
+      default: Date.now,
+      index: true,
     },
   },
   { timestamps: true }
 );
+
+// Compound index to guarantee uniqueness of mobileNumber + countryCode
+UserSchema.index({ mobileNumber: 1, countryCode: 1 }, { unique: true });
+
+// Pre-save hook to keep phone and name synced for seamless compatibility
+UserSchema.pre('save', function (next) {
+  if (this.mobileNumber && !this.phone) {
+    this.phone = this.mobileNumber;
+  }
+  if (this.fullName && (!this.name || this.name === 'Customer')) {
+    this.name = this.fullName;
+  } else if (this.name && !this.fullName) {
+    this.fullName = this.name;
+  }
+  next();
+});
 
 export const User = mongoose.model<IUser>('User', UserSchema);

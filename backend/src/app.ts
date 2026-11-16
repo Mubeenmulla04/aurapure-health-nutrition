@@ -21,7 +21,10 @@ import { invoiceRoutes } from './modules/invoices/invoice.routes.js';
 import { reviewRoutes } from './modules/reviews/review.routes.js';
 import { faqRoutes } from './modules/faqs/faq.routes.js';
 import { bannerRoutes } from './modules/banners/banner.routes.js';
+import { slideRoutes } from './modules/slides/slide.routes.js';
 import { adminRoutes } from './modules/admin/admin.routes.js';
+import { OrderController } from './modules/orders/order.controller.js';
+import { ShiprocketIntegrationService } from './integrations/shiprocket/shiprocket.service.js';
 
 export function createApp(): Application {
   const app: Application = express();
@@ -102,7 +105,22 @@ export function createApp(): Application {
   api.use('/reviews', reviewRoutes);
   api.use('/faqs', faqRoutes);
   api.use('/banners', bannerRoutes);
+  api.use('/slides', slideRoutes);
   api.use('/admin', adminRoutes);
+
+  // Shiprocket PIN Code Serviceability Check
+  api.get('/shipping/serviceability', async (req: Request, res: Response, next) => {
+    try {
+      const { pincode } = req.query;
+      const data = await ShiprocketIntegrationService.checkPincodeServiceability(String(pincode || ''));
+      ApiResponse.success({ res, data });
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  // Shiprocket Carrier Tracking Webhook
+  api.post('/shipping/webhook', OrderController.handleShiprocketWebhook);
 
   app.use(env.API_PREFIX, api);
 

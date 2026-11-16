@@ -35,6 +35,9 @@ const envSchema = z.object({
   // Shiprocket
   SHIPROCKET_EMAIL: z.string().optional(),
   SHIPROCKET_PASSWORD: z.string().optional(),
+  SHIPROCKET_API_KEY: z.string().optional(),
+  SHIPROCKET_MERCHANT_ID: z.string().optional(),
+  SHIPROCKET_WEBHOOK_SECRET: z.string().default('shiprocket_webhook_secret_key_2026'),
 
   // Cloudinary
   CLOUDINARY_CLOUD_NAME: z.string().optional(),

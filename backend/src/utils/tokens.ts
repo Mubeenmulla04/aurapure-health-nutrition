@@ -3,8 +3,10 @@ import { env } from '../config/env.js';
 
 export interface TokenPayload {
   userId: string;
-  email: string;
+  mobileNumber?: string;
+  email?: string;
   role: string;
+  sessionId?: string;
 }
 
 export class TokenUtils {

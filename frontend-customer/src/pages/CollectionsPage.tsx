@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, Link } from 'react-router-dom';
 import { SlidersHorizontal, ArrowUpDown, ChevronRight, X, Check, RotateCcw } from 'lucide-react';
 import { api } from '../services/api';
@@ -279,7 +280,7 @@ export const CollectionsPage: React.FC = () => {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-5">
               {products.map((product) => (
                 <ProductCard key={product._id} product={product} />
               ))}
@@ -288,147 +289,151 @@ export const CollectionsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Filter Bottom Sheet Modal */}
-      {isMobileFilterOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={() => setIsMobileFilterOpen(false)}
-          />
-          <div className="fixed inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-2xl p-5 max-h-[85vh] overflow-y-auto space-y-5 animate-in slide-in-from-bottom duration-250 pb-safe">
-            {/* Sheet Handle */}
-            <div className="w-12 h-1 bg-brand-muted rounded-full mx-auto" />
+      {/* Mobile Filter Bottom Sheet Modal (Portaled directly to document.body) */}
+      {isMobileFilterOpen &&
+        createPortal(
+          <div className="fixed inset-0 z-[100] lg:hidden">
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setIsMobileFilterOpen(false)}
+            />
+            <div className="fixed inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-2xl p-5 max-h-[85vh] overflow-y-auto space-y-5 animate-in slide-in-from-bottom duration-250 pb-safe">
+              {/* Sheet Handle */}
+              <div className="w-12 h-1 bg-brand-muted rounded-full mx-auto" />
 
-            <div className="flex items-center justify-between pb-3 border-b border-brand-muted/70">
-              <div className="flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-brand-primary" />
-                <h3 className="font-serif text-base font-bold text-brand-dark">Filter Products</h3>
+              <div className="flex items-center justify-between pb-3 border-b border-brand-muted/70">
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="w-4 h-4 text-brand-primary" />
+                  <h3 className="font-serif text-base font-bold text-brand-dark">Filter Products</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileFilterOpen(false)}
+                  className="p-1 text-brand-subtext hover:text-brand-dark"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button
-                type="button"
-                onClick={() => setIsMobileFilterOpen(false)}
-                className="p-1 text-brand-subtext hover:text-brand-dark"
-              >
-                <X className="w-5 h-5" />
-              </button>
+
+              {/* Price Slider */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-xs font-semibold text-brand-dark">
+                  <span>Maximum Budget</span>
+                  <span className="text-brand-primary font-bold text-sm">₹{maxPrice}</span>
+                </div>
+                <input
+                  type="range"
+                  min="700"
+                  max="3000"
+                  step="100"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(Number(e.target.value))}
+                  className="w-full accent-brand-primary cursor-pointer h-2"
+                />
+                <div className="flex justify-between text-[10px] text-brand-subtext">
+                  <span>₹700</span>
+                  <span>₹3,000</span>
+                </div>
+              </div>
+
+              {/* Flavor Radio Pills */}
+              <div className="space-y-2 pt-2 border-t border-brand-muted/60">
+                <span className="text-xs font-bold uppercase tracking-wider text-brand-dark block">Flavor Preference</span>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { label: 'All Flavors', value: 'ALL' },
+                    { label: 'Dark Chocolate', value: 'Chocolate' },
+                    { label: 'Vanilla Bean', value: 'Vanilla' },
+                    { label: 'Raw Unflavored', value: 'Unflavored' },
+                    { label: 'Golden Turmeric', value: 'Turmeric' },
+                  ].map((flv) => (
+                    <button
+                      type="button"
+                      key={flv.value}
+                      onClick={() => setSelectedFlavor(flv.value)}
+                      className={`p-2.5 rounded-xl border text-xs font-semibold text-left transition-all ${
+                        selectedFlavor === flv.value
+                          ? 'border-brand-primary bg-brand-glow text-brand-primary ring-1 ring-brand-primary'
+                          : 'border-brand-muted/80 bg-white text-brand-dark'
+                      }`}
+                    >
+                      {flv.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bottom Actions */}
+              <div className="pt-3 border-t border-brand-muted/70 flex gap-3">
+                <button
+                  type="button"
+                  onClick={resetFilters}
+                  className="btn-secondary !py-3 flex-1 text-xs font-semibold"
+                >
+                  Reset All
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileFilterOpen(false)}
+                  className="btn-primary !py-3 flex-1 text-xs font-semibold"
+                >
+                  Apply ({products.length})
+                </button>
+              </div>
             </div>
+          </div>,
+          document.body
+        )}
 
-            {/* Price Slider */}
-            <div className="space-y-2">
-              <div className="flex justify-between items-center text-xs font-semibold text-brand-dark">
-                <span>Maximum Budget</span>
-                <span className="text-brand-primary font-bold text-sm">₹{maxPrice}</span>
-              </div>
-              <input
-                type="range"
-                min="700"
-                max="3000"
-                step="100"
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(Number(e.target.value))}
-                className="w-full accent-brand-primary cursor-pointer h-2"
-              />
-              <div className="flex justify-between text-[10px] text-brand-subtext">
-                <span>₹700</span>
-                <span>₹3,000</span>
-              </div>
-            </div>
+      {/* Mobile Sort Bottom Sheet Modal (Portaled directly to document.body) */}
+      {isMobileSortOpen &&
+        createPortal(
+          <div className="fixed inset-0 z-[100] lg:hidden">
+            <div
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={() => setIsMobileSortOpen(false)}
+            />
+            <div className="fixed inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-2xl p-5 space-y-4 animate-in slide-in-from-bottom duration-250 pb-safe">
+              <div className="w-12 h-1 bg-brand-muted rounded-full mx-auto" />
 
-            {/* Flavor Radio Pills */}
-            <div className="space-y-2 pt-2 border-t border-brand-muted/60">
-              <span className="text-xs font-bold uppercase tracking-wider text-brand-dark block">Flavor Preference</span>
-              <div className="grid grid-cols-2 gap-2">
-                {[
-                  { label: 'All Flavors', value: 'ALL' },
-                  { label: 'Dark Chocolate', value: 'Chocolate' },
-                  { label: 'Vanilla Bean', value: 'Vanilla' },
-                  { label: 'Raw Unflavored', value: 'Unflavored' },
-                  { label: 'Golden Turmeric', value: 'Turmeric' },
-                ].map((flv) => (
+              <div className="flex items-center justify-between pb-2 border-b border-brand-muted/70">
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown className="w-4 h-4 text-brand-primary" />
+                  <h3 className="font-serif text-base font-bold text-brand-dark">Sort By</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileSortOpen(false)}
+                  className="p-1 text-brand-subtext hover:text-brand-dark"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-1">
+                {sortOptions.map((opt) => (
                   <button
                     type="button"
-                    key={flv.value}
-                    onClick={() => setSelectedFlavor(flv.value)}
-                    className={`p-2.5 rounded-xl border text-xs font-semibold text-left transition-all ${
-                      selectedFlavor === flv.value
-                        ? 'border-brand-primary bg-brand-glow text-brand-primary ring-1 ring-brand-primary'
-                        : 'border-brand-muted/80 bg-white text-brand-dark'
+                    key={opt.value}
+                    onClick={() => {
+                      setSelectedSort(opt.value as any);
+                      setIsMobileSortOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between p-3.5 rounded-xl text-xs font-semibold text-left transition-colors ${
+                      selectedSort === opt.value
+                        ? 'bg-brand-glow text-brand-primary font-bold'
+                        : 'text-brand-dark hover:bg-brand-bg'
                     }`}
                   >
-                    {flv.label}
+                    <span>{opt.label}</span>
+                    {selectedSort === opt.value && <Check className="w-4 h-4 text-brand-primary" />}
                   </button>
                 ))}
               </div>
             </div>
-
-            {/* Bottom Actions */}
-            <div className="pt-3 border-t border-brand-muted/70 flex gap-3">
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="btn-secondary !py-3 flex-1 text-xs font-semibold"
-              >
-                Reset All
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsMobileFilterOpen(false)}
-                className="btn-primary !py-3 flex-1 text-xs font-semibold"
-              >
-                Apply ({products.length})
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Mobile Sort Bottom Sheet Modal */}
-      {isMobileSortOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={() => setIsMobileSortOpen(false)}
-          />
-          <div className="fixed inset-x-0 bottom-0 bg-white rounded-t-3xl shadow-2xl p-5 space-y-4 animate-in slide-in-from-bottom duration-250 pb-safe">
-            <div className="w-12 h-1 bg-brand-muted rounded-full mx-auto" />
-
-            <div className="flex items-center justify-between pb-2 border-b border-brand-muted/70">
-              <div className="flex items-center gap-2">
-                <ArrowUpDown className="w-4 h-4 text-brand-primary" />
-                <h3 className="font-serif text-base font-bold text-brand-dark">Sort By</h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsMobileSortOpen(false)}
-                className="p-1 text-brand-subtext hover:text-brand-dark"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-1">
-              {sortOptions.map((opt) => (
-                <button
-                  type="button"
-                  key={opt.value}
-                  onClick={() => {
-                    setSelectedSort(opt.value as any);
-                    setIsMobileSortOpen(false);
-                  }}
-                  className={`w-full flex items-center justify-between p-3.5 rounded-xl text-xs font-semibold text-left transition-colors ${
-                    selectedSort === opt.value
-                      ? 'bg-brand-glow text-brand-primary font-bold'
-                      : 'text-brand-dark hover:bg-brand-bg'
-                  }`}
-                >
-                  <span>{opt.label}</span>
-                  {selectedSort === opt.value && <Check className="w-4 h-4 text-brand-primary" />}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
 
     </div>
   );

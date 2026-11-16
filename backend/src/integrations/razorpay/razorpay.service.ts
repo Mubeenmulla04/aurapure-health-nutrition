@@ -23,6 +23,25 @@ export class RazorpayIntegrationService {
    * @param receipt Internal unique order receipt string
    */
   static async createOrder(amountRupees: number, receipt: string, notes: Record<string, string> = {}) {
+    const isMock = !env.RAZORPAY_KEY_ID || env.RAZORPAY_KEY_ID.includes('YourTestKeyIdHere') || env.RAZORPAY_KEY_ID.startsWith('rzp_test_placeholder');
+    if (isMock) {
+      const mockId = `order_mock_${Date.now()}`;
+      logger.info(`[Razorpay Sandbox] Simulating order creation: ${mockId} for receipt ${receipt}`);
+      return {
+        id: mockId,
+        entity: 'order',
+        amount: CurrencyUtils.toPaise(amountRupees),
+        amount_paid: 0,
+        amount_due: CurrencyUtils.toPaise(amountRupees),
+        currency: 'INR',
+        receipt,
+        status: 'created',
+        attempts: 0,
+        notes,
+        created_at: Math.floor(Date.now() / 1000),
+      };
+    }
+
     try {
       const razorpay = this.getInstance();
       const amountPaise = CurrencyUtils.toPaise(amountRupees);
@@ -51,6 +70,11 @@ export class RazorpayIntegrationService {
    * Cryptographically verify Razorpay Payment Signature
    */
   static verifySignature(orderId: string, paymentId: string, signature: string): boolean {
+    const isMock = !env.RAZORPAY_KEY_SECRET || env.RAZORPAY_KEY_SECRET.includes('Your') || env.RAZORPAY_KEY_SECRET.includes('SecretKey') || env.RAZORPAY_KEY_SECRET.startsWith('rzp_test');
+    if (isMock && (signature.startsWith('mock_sig_') || signature.length === 64)) {
+      return true;
+    }
+
     const generated = crypto
       .createHmac('sha256', env.RAZORPAY_KEY_SECRET)
       .update(`${orderId}|${paymentId}`)
@@ -69,5 +93,22 @@ export class RazorpayIntegrationService {
       .digest('hex');
 
     return generated === signature;
+  }
+
+  /**
+   * Initiate Razorpay Refund
+   */
+  static async createRefund(paymentId: string, amountPaise: number) {
+    try {
+      const razorpay = this.getInstance();
+      const refund = await (razorpay.payments as any).refund(paymentId, {
+        amount: amountPaise,
+        speed: 'optimum',
+      });
+      return refund;
+    } catch (error) {
+      logger.error('Failed to execute Razorpay refund:', error);
+      return null;
+    }
   }
 }

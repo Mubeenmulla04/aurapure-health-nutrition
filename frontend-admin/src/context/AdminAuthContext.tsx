@@ -1,10 +1,22 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { adminApi } from '../services/adminApi';
 
+export const STAFF_ROLES = [
+  'super_admin',
+  'admin',
+  'order_manager',
+  'product_manager',
+  'inventory_manager',
+  'support_manager',
+  'marketing_manager',
+];
+
 interface AdminUser {
   id: string;
-  name: string;
-  email: string;
+  name?: string;
+  fullName?: string;
+  mobileNumber: string;
+  email?: string;
   role: string;
 }
 
@@ -12,8 +24,11 @@ interface AdminAuthContextType {
   adminUser: AdminUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (credentials: { email: string; password: string }) => Promise<void>;
+  sendOtp: (mobileNumber: string) => Promise<{ cooldownSeconds?: number }>;
+  verifyOtp: (mobileNumber: string, otp: string) => Promise<void>;
+  resendOtp: (mobileNumber: string) => Promise<void>;
   logout: () => void;
+  hasRole: (roles: string[]) => boolean;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextType | undefined>(undefined);
@@ -32,7 +47,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         .get('/auth/me')
         .then((res) => {
           const user = res.data.data.user;
-          if (user.role === 'admin' || user.role === 'inventory_manager') {
+          if (STAFF_ROLES.includes(user.role)) {
             setAdminUser(user);
             localStorage.setItem('aurapure_admin_user', JSON.stringify(user));
           } else {
@@ -46,21 +61,46 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, []);
 
-  const login = async (credentials: { email: string; password: string }) => {
-    const res = await adminApi.post('/auth/login', credentials);
+  const sendOtp = async (mobileNumber: string) => {
+    const res = await adminApi.post('/auth/send-otp', { mobileNumber });
+    return res.data.data;
+  };
+
+  const verifyOtp = async (mobileNumber: string, otp: string) => {
+    const res = await adminApi.post('/auth/verify-otp', { mobileNumber, otp });
     const { user, accessToken } = res.data.data;
-    if (user.role !== 'admin' && user.role !== 'inventory_manager') {
-      throw new Error('Access denied. Administrator privileges required.');
+
+    if (!STAFF_ROLES.includes(user.role)) {
+      throw new Error(
+        'Access Denied: This mobile number does not possess administrative staff credentials. Please contact a Super Administrator.'
+      );
     }
+
     localStorage.setItem('aurapure_admin_token', accessToken);
     localStorage.setItem('aurapure_admin_user', JSON.stringify(user));
     setAdminUser(user);
   };
 
+  const resendOtp = async (mobileNumber: string) => {
+    await adminApi.post('/auth/resend-otp', { mobileNumber });
+  };
+
   const logout = () => {
-    localStorage.removeItem('aurapure_admin_token');
-    localStorage.removeItem('aurapure_admin_user');
-    setAdminUser(null);
+    try {
+      adminApi.post('/auth/logout').catch(() => {});
+    } catch {
+      // Ignore
+    } finally {
+      localStorage.removeItem('aurapure_admin_token');
+      localStorage.removeItem('aurapure_admin_user');
+      setAdminUser(null);
+    }
+  };
+
+  const hasRole = (roles: string[]) => {
+    if (!adminUser) return false;
+    if (adminUser.role === 'super_admin') return true;
+    return roles.includes(adminUser.role);
   };
 
   return (
@@ -69,8 +109,11 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         adminUser,
         isAuthenticated: !!adminUser,
         isLoading,
-        login,
+        sendOtp,
+        verifyOtp,
+        resendOtp,
         logout,
+        hasRole,
       }}
     >
       {children}

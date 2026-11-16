@@ -7,7 +7,9 @@ const router = Router();
 router.post('/checkout-preview', optionalAuth, OrderController.checkoutPreview);
 router.post('/', optionalAuth, OrderController.createOrder);
 router.post('/verify-payment', optionalAuth, OrderController.verifyPayment);
-router.get('/track', OrderController.trackOrder);
+router.post('/verify-shiprocket-payment', optionalAuth, OrderController.verifyShiprocketPayment);
+router.post('/shiprocket-webhook', OrderController.handleShiprocketWebhook);
+router.get('/track', optionalAuth, OrderController.trackOrder);
 
 router.get('/my-orders', authenticate, OrderController.getMyOrders);
 router.get('/:id', optionalAuth, OrderController.getOrderById);

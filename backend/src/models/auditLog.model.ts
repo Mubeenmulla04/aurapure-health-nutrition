@@ -4,7 +4,7 @@ export interface IAuditLog extends Document {
   userId?: Types.ObjectId;
   userName?: string;
   action: string; // e.g. 'PRODUCT_UPDATE', 'ORDER_STATUS_CHANGE', 'REFUND_INITIATED', 'INVENTORY_ADJUST'
-  entity: 'PRODUCT' | 'ORDER' | 'INVENTORY' | 'COUPON' | 'REFUND' | 'CATEGORY' | 'USER';
+  entity: 'PRODUCT' | 'ORDER' | 'INVENTORY' | 'COUPON' | 'REFUND' | 'CATEGORY' | 'USER' | 'SETTINGS' | 'STAFF';
   entityId: string;
   diff?: {
     before?: any;
@@ -30,7 +30,7 @@ const AuditLogSchema = new Schema<IAuditLog>(
     },
     entity: {
       type: String,
-      enum: ['PRODUCT', 'ORDER', 'INVENTORY', 'COUPON', 'REFUND', 'CATEGORY', 'USER'],
+      enum: ['PRODUCT', 'ORDER', 'INVENTORY', 'COUPON', 'REFUND', 'CATEGORY', 'USER', 'SETTINGS', 'STAFF'],
       required: true,
       index: true,
     },
