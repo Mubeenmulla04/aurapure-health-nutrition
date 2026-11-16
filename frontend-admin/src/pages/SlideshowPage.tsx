@@ -263,19 +263,19 @@ export const SlideshowPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
-            <SlidersHorizontal className="w-6 h-6 text-brand-gold" />
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 flex flex-wrap items-center gap-2">
+            <SlidersHorizontal className="w-6 h-6 text-teal-700" />
             <span>Homepage Hero Slideshow</span>
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Manage, reorder, preview and schedule promotional carousel slides displayed directly beneath the main navbar.
           </p>
         </div>
         <button
           onClick={handleOpenAdd}
-          className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-lg text-sm font-medium transition shadow-sm"
+          className="admin-btn-primary flex items-center justify-center gap-2 w-full sm:w-auto text-xs"
         >
           <Plus className="w-4 h-4" />
           <span>Add New Slide</span>
@@ -284,30 +284,30 @@ export const SlideshowPage: React.FC = () => {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total Slides" value={totalSlides} icon={SlidersHorizontal} />
+        <StatCard title="Total Slides" value={totalSlides} icon={SlidersHorizontal} iconColor="text-teal-700 bg-teal-50 border-teal-200" />
         <StatCard
           title="Active Slides"
           value={activeSlides}
           icon={CheckCircle2}
-          iconColor="text-emerald-500 bg-emerald-950/40 border-emerald-800"
+          iconColor="text-emerald-700 bg-emerald-50 border-emerald-200"
           trend={{ value: 100, isPositive: true }}
         />
         <StatCard
           title="Campaign Scheduled"
           value={scheduledSlides}
           icon={Calendar}
-          iconColor="text-amber-500 bg-amber-950/40 border-amber-800"
+          iconColor="text-amber-700 bg-amber-50 border-amber-200"
         />
         <StatCard
           title="Draft / Inactive"
           value={draftSlides}
           icon={XCircle}
-          iconColor="text-slate-400 bg-slate-800 border-slate-700"
+          iconColor="text-slate-500 bg-slate-100 border-slate-200"
         />
       </div>
 
       {/* Filter / Search Bar */}
-      <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xs">
         <div className="relative flex-1 max-w-md">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -315,20 +315,20 @@ export const SlideshowPage: React.FC = () => {
             placeholder="Search slides by title, heading, copy..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-900 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-primary"
+            className="w-full bg-slate-50 hover:bg-slate-100 focus:bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-teal-600 transition-all"
           />
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-400 font-medium">Status:</span>
+          <span className="text-xs text-slate-500 font-medium">Status:</span>
           {(['all', 'active', 'draft'] as const).map((filter) => (
             <button
               key={filter}
               onClick={() => setStatusFilter(filter)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${
                 statusFilter === filter
-                  ? 'bg-brand-primary text-white'
-                  : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-700'
+                  ? 'bg-teal-700 text-white shadow-2xs'
+                  : 'bg-slate-50 text-slate-600 hover:text-slate-900 hover:bg-slate-100 border border-slate-200'
               }`}
             >
               {filter}
@@ -338,21 +338,21 @@ export const SlideshowPage: React.FC = () => {
       </div>
 
       {/* Slides Table */}
-      <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl overflow-hidden shadow-sm">
+      <div className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
         {loading ? (
-          <div className="p-12 text-center text-slate-400 text-sm">Loading slides catalog...</div>
+          <div className="p-12 text-center text-slate-400 text-xs">Loading slides catalog...</div>
         ) : filteredSlides.length === 0 ? (
           <div className="p-12 text-center">
-            <SlidersHorizontal className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-            <p className="text-slate-300 font-medium">No slides found</p>
-            <p className="text-slate-500 text-sm mt-1">
+            <SlidersHorizontal className="w-12 h-12 text-slate-300 mx-auto mb-3" />
+            <p className="text-slate-700 font-medium text-xs">No slides found</p>
+            <p className="text-slate-400 text-xs mt-1">
               {searchQuery ? 'Try adjusting your search criteria' : 'Click "Add New Slide" to create your first carousel slide.'}
             </p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-slate-300">
-              <thead className="bg-slate-900/60 text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700">
+            <table className="w-full text-left text-xs text-slate-700">
+              <thead className="bg-slate-50/70 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200">
                 <tr>
                   <th className="py-3 px-4 w-16 text-center">Order</th>
                   <th className="py-3 px-4 w-44">Preview</th>
@@ -363,32 +363,32 @@ export const SlideshowPage: React.FC = () => {
                   <th className="py-3 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/60">
+              <tbody className="divide-y divide-slate-100">
                 {filteredSlides.map((slide, index) => {
                   const hasSchedule = slide.startDate || slide.endDate;
                   const isExpired = slide.endDate && new Date(slide.endDate) < now;
                   const isUpcoming = slide.startDate && new Date(slide.startDate) > now;
 
                   return (
-                    <tr key={slide._id} className="hover:bg-slate-700/30 transition">
+                    <tr key={slide._id} className="hover:bg-slate-50/80 transition-colors">
                       {/* Order Controls */}
                       <td className="py-4 px-4 text-center">
                         <div className="flex flex-col items-center gap-1">
                           <button
                             disabled={index === 0}
                             onClick={() => handleMoveOrder(index, 'up')}
-                            className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-700 disabled:opacity-30 disabled:hover:bg-transparent"
+                            className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent"
                             title="Move Up"
                           >
                             <ChevronUp className="w-4 h-4" />
                           </button>
-                          <span className="font-mono text-xs font-bold text-slate-400">
+                          <span className="font-mono text-xs font-bold text-slate-600">
                             #{slide.displayOrder + 1}
                           </span>
                           <button
                             disabled={index === filteredSlides.length - 1}
                             onClick={() => handleMoveOrder(index, 'down')}
-                            className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-700 disabled:opacity-30 disabled:hover:bg-transparent"
+                            className="p-1 rounded text-slate-400 hover:text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-transparent"
                             title="Move Down"
                           >
                             <ChevronDown className="w-4 h-4" />
@@ -399,18 +399,18 @@ export const SlideshowPage: React.FC = () => {
                       {/* Visual Thumbnails */}
                       <td className="py-4 px-4">
                         <div className="space-y-1.5">
-                          <div className="relative aspect-[16/9] w-36 rounded-md overflow-hidden bg-slate-900 border border-slate-700 group">
+                          <div className="relative aspect-[16/9] w-36 rounded-md overflow-hidden bg-slate-100 border border-slate-200 group">
                             <img
                               src={slide.desktopImage}
                               alt={slide.imageAltText || slide.title}
                               className="w-full h-full object-cover"
                             />
-                            <span className="absolute bottom-1 right-1 bg-black/70 text-[9px] font-mono text-slate-200 px-1 py-0.5 rounded">
+                            <span className="absolute bottom-1 right-1 bg-black/70 text-[9px] font-mono text-white px-1 py-0.5 rounded">
                               Desktop
                             </span>
                           </div>
-                          <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
-                            <Smartphone className="w-3 h-3 text-slate-500" />
+                          <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+                            <Smartphone className="w-3 h-3 text-slate-400" />
                             <span>Mobile Asset Linked</span>
                           </div>
                         </div>
@@ -420,23 +420,23 @@ export const SlideshowPage: React.FC = () => {
                       <td className="py-4 px-4 max-w-sm">
                         <div className="space-y-1">
                           {slide.badgeText && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-brand-primary/20 text-brand-primary-light border border-brand-primary/30">
-                              <Sparkles className="w-2.5 h-2.5 text-brand-gold" />
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-teal-50 text-teal-800 border border-teal-200">
+                              <Sparkles className="w-2.5 h-2.5 text-teal-600" />
                               {slide.badgeText}
                             </span>
                           )}
-                          <p className="font-semibold text-slate-100 text-sm line-clamp-1">{slide.heading}</p>
-                          <p className="text-xs text-slate-400 line-clamp-2">{slide.subtitle || slide.title}</p>
+                          <p className="font-semibold text-slate-900 text-xs line-clamp-1">{slide.heading}</p>
+                          <p className="text-[11px] text-slate-500 line-clamp-2">{slide.subtitle || slide.title}</p>
                         </div>
                       </td>
 
                       {/* CTA */}
                       <td className="py-4 px-4">
                         <div className="space-y-1">
-                          <span className="inline-block px-2 py-1 bg-slate-900 border border-slate-700 text-xs font-medium text-slate-200 rounded">
+                          <span className="inline-block px-2 py-0.5 bg-slate-100 border border-slate-200 text-[11px] font-medium text-slate-700 rounded">
                             {slide.ctaText}
                           </span>
-                          <p className="text-[11px] text-slate-400 truncate max-w-[180px] font-mono">
+                          <p className="text-[10px] text-slate-400 truncate max-w-[180px] font-mono">
                             {slide.ctaLink}
                           </p>
                         </div>
@@ -447,26 +447,26 @@ export const SlideshowPage: React.FC = () => {
                         {hasSchedule ? (
                           <div className="space-y-1">
                             {isExpired ? (
-                              <span className="inline-flex items-center gap-1 text-red-400 bg-red-950/40 px-2 py-0.5 rounded text-[11px]">
-                                <Calendar className="w-3 h-3" /> Expired
+                              <span className="inline-flex items-center gap-1 text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded text-[10px] font-semibold">
+                                <Calendar className="w-3 h-3 text-rose-500" /> Expired
                               </span>
                             ) : isUpcoming ? (
-                              <span className="inline-flex items-center gap-1 text-amber-400 bg-amber-950/40 px-2 py-0.5 rounded text-[11px]">
-                                <Calendar className="w-3 h-3" /> Upcoming
+                              <span className="inline-flex items-center gap-1 text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded text-[10px] font-semibold">
+                                <Calendar className="w-3 h-3 text-amber-500" /> Upcoming
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded text-[11px]">
-                                <Calendar className="w-3 h-3" /> Active Campaign
+                              <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-semibold">
+                                <Calendar className="w-3 h-3 text-emerald-500" /> Active Campaign
                               </span>
                             )}
                             {slide.endDate && (
-                              <p className="text-[10px] text-slate-500">
+                              <p className="text-[10px] text-slate-400">
                                 Until: {new Date(slide.endDate).toLocaleDateString()}
                               </p>
                             )}
                           </div>
                         ) : (
-                          <span className="text-slate-500 text-xs">Always Running</span>
+                          <span className="text-slate-400 text-xs">Always Running</span>
                         )}
                       </td>
 
@@ -476,13 +476,13 @@ export const SlideshowPage: React.FC = () => {
                           onClick={() => handleToggleStatus(slide)}
                           className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition ${
                             slide.isActive
-                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20'
-                              : 'bg-slate-700 text-slate-400 border border-slate-600 hover:bg-slate-600'
+                              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100'
+                              : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'
                           }`}
                         >
                           {slide.isActive ? (
                             <>
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                               Active
                             </>
                           ) : (
@@ -499,14 +499,14 @@ export const SlideshowPage: React.FC = () => {
                         <div className="inline-flex items-center gap-1">
                           <button
                             onClick={() => handleOpenPreview(slide)}
-                            className="p-1.5 text-slate-400 hover:text-brand-primary-light hover:bg-slate-700/60 rounded transition"
+                            className="p-1.5 text-slate-400 hover:text-teal-700 hover:bg-teal-50 rounded-md transition-colors"
                             title="Live Storefront Preview"
                           >
                             <Eye className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleOpenEdit(slide)}
-                            className="p-1.5 text-slate-400 hover:text-blue-400 hover:bg-slate-700/60 rounded transition"
+                            className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors"
                             title="Edit Slide"
                           >
                             <Edit2 className="w-4 h-4" />
@@ -516,7 +516,7 @@ export const SlideshowPage: React.FC = () => {
                               setSlideToDelete(slide);
                               setIsDeleteOpen(true);
                             }}
-                            className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-700/60 rounded transition"
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors"
                             title="Delete Slide"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -544,8 +544,8 @@ export const SlideshowPage: React.FC = () => {
           {/* Internal Title & Badge */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Internal Slide Title <span className="text-red-400">*</span>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Internal Slide Title <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -553,11 +553,11 @@ export const SlideshowPage: React.FC = () => {
                 value={formData.title || ''}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder="e.g. Clean Plant Protein Launch"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-primary text-sm"
+                className="admin-input"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Promotional Badge Pill (Optional)
               </label>
               <input
@@ -565,15 +565,15 @@ export const SlideshowPage: React.FC = () => {
                 value={formData.badgeText || ''}
                 onChange={(e) => setFormData({ ...formData, badgeText: e.target.value })}
                 placeholder="e.g. Zero Bloat Guarantee • 25g Pure Protein"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-primary text-sm"
+                className="admin-input"
               />
             </div>
           </div>
 
           {/* Heading & Subtitle */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Hero Headline (H1) <span className="text-red-400">*</span>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
+              Hero Headline (H1) <span className="text-rose-500">*</span>
             </label>
             <input
               type="text"
@@ -581,12 +581,12 @@ export const SlideshowPage: React.FC = () => {
               value={formData.heading || ''}
               onChange={(e) => setFormData({ ...formData, heading: e.target.value })}
               placeholder="e.g. Pure Plant Power. Zero Compromise."
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-primary text-sm"
+              className="admin-input"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
+            <label className="block text-xs font-semibold text-slate-700 mb-1">
               Subtitle / Supporting Copy
             </label>
             <textarea
@@ -594,15 +594,15 @@ export const SlideshowPage: React.FC = () => {
               value={formData.subtitle || ''}
               onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
               placeholder="e.g. Cold-pressed organic plant protein with digestive enzymes & Ayurvedic adaptogens..."
-              className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-primary text-sm"
+              className="admin-input resize-none"
             />
           </div>
 
           {/* CTA Button & Target Link */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Call to Action Text <span className="text-red-400">*</span>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Call to Action Text <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -610,12 +610,12 @@ export const SlideshowPage: React.FC = () => {
                 value={formData.ctaText || ''}
                 onChange={(e) => setFormData({ ...formData, ctaText: e.target.value })}
                 placeholder="e.g. Shop Clean Proteins"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-brand-primary text-sm"
+                className="admin-input"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Target URL / Route <span className="text-red-400">*</span>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Target URL / Route <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
@@ -623,21 +623,21 @@ export const SlideshowPage: React.FC = () => {
                 value={formData.ctaLink || ''}
                 onChange={(e) => setFormData({ ...formData, ctaLink: e.target.value })}
                 placeholder="e.g. /collections/plant-protein-powder"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 font-mono text-sm focus:outline-none focus:border-brand-primary"
+                className="admin-input font-mono"
               />
             </div>
           </div>
 
           {/* Dual Imagery (Desktop & Mobile) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-900/60 rounded-xl border border-slate-700">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
             {/* Desktop Banner */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                  <Monitor className="w-3.5 h-3.5 text-blue-400" />
+                <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                  <Monitor className="w-3.5 h-3.5 text-blue-600" />
                   <span>Desktop Banner (16:9 / 1920x800)</span>
                 </label>
-                <label className="cursor-pointer text-[11px] font-semibold text-brand-primary-light hover:underline inline-flex items-center gap-1">
+                <label className="cursor-pointer text-[11px] font-semibold text-teal-700 hover:underline inline-flex items-center gap-1">
                   <Upload className="w-3 h-3" />
                   <span>{uploadingDesktop ? 'Uploading...' : 'Upload Image'}</span>
                   <input
@@ -655,10 +655,10 @@ export const SlideshowPage: React.FC = () => {
                 value={formData.desktopImage || ''}
                 onChange={(e) => setFormData({ ...formData, desktopImage: e.target.value })}
                 placeholder="https://... or click Upload Image"
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-brand-primary"
+                className="admin-input font-mono text-xs"
               />
               {formData.desktopImage && (
-                <div className="aspect-[16/9] w-full rounded-md overflow-hidden bg-black/40 border border-slate-700">
+                <div className="aspect-[16/9] w-full rounded-md overflow-hidden bg-slate-100 border border-slate-200">
                   <img
                     src={formData.desktopImage}
                     alt="Desktop preview"
@@ -671,11 +671,11 @@ export const SlideshowPage: React.FC = () => {
             {/* Mobile Banner */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                  <Smartphone className="w-3.5 h-3.5 text-emerald-400" />
+                <label className="text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+                  <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Mobile Banner (4:5 / 800x1000)</span>
                 </label>
-                <label className="cursor-pointer text-[11px] font-semibold text-brand-primary-light hover:underline inline-flex items-center gap-1">
+                <label className="cursor-pointer text-[11px] font-semibold text-teal-700 hover:underline inline-flex items-center gap-1">
                   <Upload className="w-3 h-3" />
                   <span>{uploadingMobile ? 'Uploading...' : 'Upload Image'}</span>
                   <input
@@ -693,10 +693,10 @@ export const SlideshowPage: React.FC = () => {
                 value={formData.mobileImage || ''}
                 onChange={(e) => setFormData({ ...formData, mobileImage: e.target.value })}
                 placeholder="https://... or click Upload Image"
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 font-mono focus:outline-none focus:border-brand-primary"
+                className="admin-input font-mono text-xs"
               />
               {formData.mobileImage && (
-                <div className="aspect-[4/3] w-full rounded-md overflow-hidden bg-black/40 border border-slate-700">
+                <div className="aspect-[4/3] w-full rounded-md overflow-hidden bg-slate-100 border border-slate-200">
                   <img
                     src={formData.mobileImage}
                     alt="Mobile preview"
@@ -710,7 +710,7 @@ export const SlideshowPage: React.FC = () => {
           {/* Alt text & Order */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Image Alt Text (Accessibility & SEO)
               </label>
               <input
@@ -718,11 +718,11 @@ export const SlideshowPage: React.FC = () => {
                 value={formData.imageAltText || ''}
                 onChange={(e) => setFormData({ ...formData, imageAltText: e.target.value })}
                 placeholder="e.g. AuraPure Organic Belgian Chocolate Plant Protein"
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 text-sm focus:outline-none focus:border-brand-primary"
+                className="admin-input"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Display Order Index
               </label>
               <input
@@ -730,33 +730,33 @@ export const SlideshowPage: React.FC = () => {
                 min={0}
                 value={formData.displayOrder ?? 0}
                 onChange={(e) => setFormData({ ...formData, displayOrder: Number(e.target.value) })}
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 text-sm focus:outline-none focus:border-brand-primary"
+                className="admin-input"
               />
             </div>
           </div>
 
           {/* Scheduling Dates */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 bg-slate-900/40 rounded-xl border border-slate-700/60">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-3 bg-slate-50 rounded-xl border border-slate-200">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Campaign Start Date & Time (Optional)
               </label>
               <input
                 type="datetime-local"
                 value={formData.startDate || ''}
                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-brand-primary"
+                className="admin-input text-xs"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Campaign End Date & Time (Optional)
               </label>
               <input
                 type="datetime-local"
                 value={formData.endDate || ''}
                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-200 text-xs focus:outline-none focus:border-brand-primary"
+                className="admin-input text-xs"
               />
             </div>
           </div>
@@ -768,26 +768,26 @@ export const SlideshowPage: React.FC = () => {
               id="isActiveSlide"
               checked={formData.isActive ?? true}
               onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-              className="w-4 h-4 rounded border-slate-700 text-brand-primary focus:ring-brand-primary bg-slate-900"
+              className="w-4 h-4 rounded border-slate-300 text-teal-700 focus:ring-teal-600"
             />
-            <label htmlFor="isActiveSlide" className="text-sm font-medium text-slate-200 cursor-pointer">
+            <label htmlFor="isActiveSlide" className="text-xs font-medium text-slate-700 cursor-pointer">
               Publish slide immediately to the storefront carousel
             </label>
           </div>
 
           {/* Submit Actions */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-700">
+          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
             <button
               type="button"
               onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-sm transition"
+              className="admin-btn-secondary text-xs"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={actionLoading}
-              className="px-5 py-2 bg-brand-primary hover:bg-brand-primary-dark text-white rounded-lg text-sm font-semibold transition disabled:opacity-50 shadow-sm"
+              className="admin-btn-primary text-xs"
             >
               {actionLoading ? 'Saving...' : editingSlide ? 'Update Slide' : 'Create Slide'}
             </button>
@@ -806,13 +806,13 @@ export const SlideshowPage: React.FC = () => {
         >
           <div className="space-y-4">
             {/* Device Switcher */}
-            <div className="flex items-center justify-center gap-2 p-1 bg-slate-900 rounded-lg max-w-xs mx-auto border border-slate-700">
+            <div className="flex items-center justify-center gap-2 p-1 bg-slate-100 rounded-lg max-w-xs mx-auto border border-slate-200">
               <button
                 onClick={() => setPreviewDevice('desktop')}
                 className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-md text-xs font-semibold transition ${
                   previewDevice === 'desktop'
-                    ? 'bg-brand-primary text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-white text-slate-900 shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
                 <Monitor className="w-3.5 h-3.5" />
@@ -822,8 +822,8 @@ export const SlideshowPage: React.FC = () => {
                 onClick={() => setPreviewDevice('mobile')}
                 className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-md text-xs font-semibold transition ${
                   previewDevice === 'mobile'
-                    ? 'bg-brand-primary text-white shadow-sm'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-white text-slate-900 shadow-2xs'
+                    : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
                 <Smartphone className="w-3.5 h-3.5" />

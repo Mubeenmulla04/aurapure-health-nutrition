@@ -441,7 +441,7 @@ export const ProductsPage: React.FC = () => {
       </div>
 
       {/* KPI Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="admin-card p-5">
           <div className="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Catalog SKUs</div>
           <div className="text-2xl font-bold text-slate-900 mt-2">{products.length}</div>
