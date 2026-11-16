@@ -416,7 +416,7 @@ export function DataTable<T extends Record<string, any>>({
 
       {/* Bottom Pagination Bar */}
       <div className="px-4 py-3 border-t border-slate-200 bg-white flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-center sm:text-left">
           <span>Rows per page:</span>
           <select
             value={pageSize}
@@ -432,7 +432,7 @@ export function DataTable<T extends Record<string, any>>({
               </option>
             ))}
           </select>
-          <span className="text-slate-400">|</span>
+          <span className="text-slate-400 hidden sm:inline">|</span>
           <span>
             Showing <strong>{totalItems === 0 ? 0 : (activePage - 1) * pageSize + 1}</strong> to{' '}
             <strong>{Math.min(activePage * pageSize, totalItems)}</strong> of{' '}
