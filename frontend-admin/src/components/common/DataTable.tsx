@@ -450,7 +450,7 @@ export function DataTable<T extends Record<string, any>>({
               if (serverPagination) serverPagination.onPageChange(p);
               else setCurrentPage(p);
             }}
-            className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white"
+            className="min-w-[36px] min-h-[36px] sm:w-8 sm:h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white"
             title="First Page"
           >
             <ChevronsLeft className="w-4 h-4" />
@@ -463,7 +463,7 @@ export function DataTable<T extends Record<string, any>>({
               if (serverPagination) serverPagination.onPageChange(p);
               else setCurrentPage(p);
             }}
-            className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white"
+            className="min-w-[36px] min-h-[36px] sm:w-8 sm:h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white"
             title="Previous Page"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -481,7 +481,7 @@ export function DataTable<T extends Record<string, any>>({
               if (serverPagination) serverPagination.onPageChange(p);
               else setCurrentPage(p);
             }}
-            className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white"
+            className="min-w-[36px] min-h-[36px] sm:w-8 sm:h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white"
             title="Next Page"
           >
             <ChevronRight className="w-4 h-4" />
@@ -494,7 +494,7 @@ export function DataTable<T extends Record<string, any>>({
               if (serverPagination) serverPagination.onPageChange(p);
               else setCurrentPage(p);
             }}
-            className="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white"
+            className="min-w-[36px] min-h-[36px] sm:w-8 sm:h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white"
             title="Last Page"
           >
             <ChevronsRight className="w-4 h-4" />

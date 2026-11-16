@@ -179,7 +179,7 @@ export const CategoriesPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleOpenEdit(cat)}
-            className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
             title="Edit Category"
           >
             <Edit2 className="w-4 h-4" />
@@ -189,7 +189,7 @@ export const CategoriesPage: React.FC = () => {
               setCategoryToDelete(cat);
               setIsDeleteOpen(true);
             }}
-            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
             title="Delete Category"
           >
             <Trash2 className="w-4 h-4" />

@@ -135,7 +135,7 @@ export const ReviewsPage: React.FC = () => {
             setReviewToDelete(r);
             setIsDeleteOpen(true);
           }}
-          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+          className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
           title="Delete Fraudulent Review"
         >
           <Trash2 className="w-4 h-4" />

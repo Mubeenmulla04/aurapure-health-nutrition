@@ -316,7 +316,7 @@ export const OrdersPage: React.FC = () => {
           </span>
           <button
             onClick={() => handleDownloadManifest(ord._id)}
-            className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors"
+            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors"
             title="Download Handover Manifest"
           >
             <FileText className="w-4 h-4" />
@@ -338,7 +338,7 @@ export const OrdersPage: React.FC = () => {
               href={tracking.trackingUrl}
               target="_blank"
               rel="noreferrer"
-              className="p-1.5 text-teal-700 hover:bg-teal-50 rounded-md transition-colors"
+              className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-teal-700 hover:bg-teal-50 rounded-md transition-colors"
               title="Track live on courier site"
             >
               <ExternalLink className="w-3.5 h-3.5" />
@@ -495,7 +495,7 @@ export const OrdersPage: React.FC = () => {
           {renderNextAction(ord)}
           <button
             onClick={() => handleOpenDetail(ord)}
-            className="p-1.5 text-slate-400 hover:text-teal-700 hover:bg-teal-50 rounded-md transition-colors"
+            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-400 hover:text-teal-700 hover:bg-teal-50 rounded-md transition-colors"
             title="Inspect full order"
             aria-label="Inspect full order"
           >
@@ -503,7 +503,7 @@ export const OrdersPage: React.FC = () => {
           </button>
           <button
             onClick={() => handleDownloadInvoice(ord._id, ord.orderNumber)}
-            className="p-1.5 text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-md transition-colors"
+            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 rounded-md transition-colors"
             title="Download Tax Invoice"
             aria-label="Download Tax Invoice"
           >

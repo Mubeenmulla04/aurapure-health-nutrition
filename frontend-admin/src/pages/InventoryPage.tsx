@@ -198,21 +198,21 @@ export const InventoryPage: React.FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleOpenAdjust(inv, 'add')}
-            className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
             title="Receive Stock (+)"
           >
             <Plus className="w-4 h-4" />
           </button>
           <button
             onClick={() => handleOpenAdjust(inv, 'deduct')}
-            className="p-1.5 text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
             title="Deduct / Discard Stock (-)"
           >
             <Minus className="w-4 h-4" />
           </button>
           <button
             onClick={() => handleOpenHistory(inv)}
-            className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+            className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
             title="View Stock Audit Ledger"
           >
             <History className="w-4 h-4" />

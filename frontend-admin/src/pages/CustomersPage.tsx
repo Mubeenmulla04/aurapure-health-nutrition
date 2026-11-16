@@ -185,7 +185,7 @@ export const CustomersPage: React.FC = () => {
       render: (cust: CustomerData) => (
         <button
           onClick={() => handleOpenProfile(cust)}
-          className="p-1.5 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+          className="p-2 sm:p-1.5 min-w-[36px] min-h-[36px] flex items-center justify-center text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
           title="View Customer Profile"
         >
           <Eye className="w-4 h-4" />
