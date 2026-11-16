@@ -202,15 +202,15 @@ export const CustomersPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Customer Directory & Spend Profiles</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Customer Directory & Spend Profiles</h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Analyze customer lifetime value (LTV), review order histories, and manage verified account statuses.
           </p>
         </div>
         <button
           onClick={handleExportCsv}
           disabled={exporting}
-          className="admin-btn-secondary flex items-center gap-2 self-start sm:self-auto text-xs"
+          className="admin-btn-secondary flex items-center justify-center gap-2 w-full sm:w-auto text-xs"
         >
           <Download className="w-4 h-4" />
           <span>{exporting ? 'Exporting...' : 'Export Directory (CSV)'}</span>

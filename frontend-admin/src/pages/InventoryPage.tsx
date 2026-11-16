@@ -230,8 +230,8 @@ export const InventoryPage: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-900">Inventory Master & Stock Ledger</h1>
-        <p className="text-sm text-slate-500 mt-1">
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Inventory Master & Stock Ledger</h1>
+        <p className="text-xs sm:text-sm text-slate-500 mt-1">
           Monitor physical warehouse units, manage stock allocations, and audit atomic replenishment movements.
         </p>
       </div>

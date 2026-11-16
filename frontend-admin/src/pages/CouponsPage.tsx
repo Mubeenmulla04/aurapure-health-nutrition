@@ -261,12 +261,12 @@ export const CouponsPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900">Coupons & Promotional Discounts</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">Coupons & Promotional Discounts</h1>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Configure automated cart discount codes, minimum order rules, and seasonal wellness campaigns.
           </p>
         </div>
-        <button onClick={() => setIsAddModalOpen(true)} className="admin-btn-primary flex items-center gap-2">
+        <button onClick={() => setIsAddModalOpen(true)} className="admin-btn-primary flex items-center justify-center gap-2 w-full sm:w-auto">
           <Plus className="w-4 h-4" />
           <span>Create Coupon Code</span>
         </button>
