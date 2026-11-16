@@ -17,6 +17,8 @@ export const CollectionsPage: React.FC = () => {
   const [maxPrice, setMaxPrice] = useState<number>(3000);
   const [selectedFlavor, setSelectedFlavor] = useState<string>('ALL');
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   // Mobile Bottom Sheet states
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
@@ -42,6 +44,7 @@ export const CollectionsPage: React.FC = () => {
     const fetchProducts = async () => {
       try {
         setIsLoading(true);
+        setError(null);
         const params: any = {
           sort: selectedSort,
           maxPrice,
@@ -57,15 +60,15 @@ export const CollectionsPage: React.FC = () => {
         if (res.data?.data?.products) {
           setProducts(res.data.data.products);
         }
-      } catch (err) {
-        console.error('Error fetching collection products:', err);
+      } catch (err: any) {
+        setError(err.response?.data?.message || 'Unable to load products. Please check your connection and try again.');
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchProducts();
-  }, [slug, selectedSort, maxPrice, selectedFlavor]);
+  }, [slug, selectedSort, maxPrice, selectedFlavor, retryCount]);
 
   const activeFilterCount = (selectedFlavor !== 'ALL' ? 1 : 0) + (maxPrice < 3000 ? 1 : 0);
 
@@ -265,7 +268,19 @@ export const CollectionsPage: React.FC = () => {
           </div>
 
           {/* Two-Column Mobile Product Grid (and 3-column desktop) */}
-          {products.length === 0 && !isLoading ? (
+          {error && !isLoading ? (
+            <div className="p-8 sm:p-12 text-center bg-white rounded-2xl sm:rounded-3xl border border-red-200/80 space-y-3">
+              <h3 className="font-serif text-lg font-bold text-red-700">Unable to load products</h3>
+              <p className="text-xs text-brand-subtext max-w-sm mx-auto">{error}</p>
+              <button
+                type="button"
+                onClick={() => setRetryCount((c) => c + 1)}
+                className="btn-primary !text-xs !py-2.5 !px-5 inline-flex items-center gap-2"
+              >
+                <RotateCcw className="w-3.5 h-3.5" /> Try Again
+              </button>
+            </div>
+          ) : products.length === 0 && !isLoading ? (
             <div className="p-8 sm:p-12 text-center bg-white rounded-2xl sm:rounded-3xl border border-brand-muted/70 space-y-3">
               <h3 className="font-serif text-lg font-bold text-brand-dark">No products match your filter</h3>
               <p className="text-xs text-brand-subtext max-w-sm mx-auto">

@@ -97,7 +97,7 @@ export class SmsIntegrationService {
         '└──────────────────────────────────────────────────────────────┘',
       ].join('\n');
 
-      console.log('\n' + banner + '\n');
+      logger.info('\n' + banner + '\n');
       logger.info(`[DEV SMS SIMULATOR] Generated OTP ${otp} for ${countryCode} ${mobileNumber}`);
       return { success: true, messageId: `SIMULATED_${Date.now()}` };
     }

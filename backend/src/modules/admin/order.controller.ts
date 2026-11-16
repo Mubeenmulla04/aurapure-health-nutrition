@@ -11,6 +11,7 @@ import { WhatsAppIntegrationService } from '../../integrations/whatsapp/whatsapp
 import { ShiprocketIntegrationService } from '../../integrations/shiprocket/shiprocket.service.js';
 import { OrderNotificationDispatcher } from '../orders/orderNotification.service.js';
 import { ApiResponse } from '../../utils/apiResponse.js';
+import { logger } from '../../utils/logger.js';
 import fs from 'fs';
 
 // Valid status transitions across full lifecycle
@@ -344,7 +345,7 @@ export class AdminOrderController {
           location: location || 'Warehouse Hub',
         });
       } catch (notifErr: any) {
-        console.warn('Notification dispatch failed non-blockingly:', notifErr.message);
+        logger.warn(`Notification dispatch failed non-blockingly: ${notifErr.message}`);
       }
 
       ApiResponse.success({
@@ -688,7 +689,7 @@ export class AdminOrderController {
           location: 'Bengaluru Hub',
         });
       } catch (err: any) {
-        console.warn('Non-blocking notification error:', err.message);
+        logger.warn(`Non-blocking notification error: ${err.message}`);
       }
 
       await AuditLog.create({
@@ -859,7 +860,7 @@ export class AdminOrderController {
           location: 'Outbound Dock',
         });
       } catch (err: any) {
-        console.warn('Non-blocking notification error:', err.message);
+        logger.warn(`Non-blocking notification error: ${err.message}`);
       }
 
       await AuditLog.create({

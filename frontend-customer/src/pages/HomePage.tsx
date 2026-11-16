@@ -32,10 +32,14 @@ export const HomePage: React.FC = () => {
   const [faqs, setFaqs] = useState<FAQItem[]>([]);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
         const [prodRes, catRes, faqRes] = await Promise.all([
           api.get('/products/featured'),
           api.get('/categories'),
@@ -51,21 +55,39 @@ export const HomePage: React.FC = () => {
         if (faqRes.data?.data?.faqs) {
           setFaqs(faqRes.data.data.faqs);
         }
-      } catch (err) {
-        console.error('Error fetching homepage data:', err);
+      } catch (err: any) {
+        setError(err.response?.data?.message || 'Failed to load some store content. Please check your connection.');
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [retryCount]);
 
   return (
     <div className="space-y-8 sm:space-y-16 pb-12 sm:pb-20 overflow-hidden">
       
       {/* 1. Premium Dynamic Slideshow (Immediately Below Navbar) */}
       <HeroSlideshow />
+
+      {/* Non-blocking error notification banner if fetch failed */}
+      {error && !isLoading && (
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold">{error}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setRetryCount((c) => c + 1)}
+              className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-lg inline-flex items-center gap-1.5 transition-colors"
+            >
+              <RefreshCw className="w-3.5 h-3.5" /> Try Again
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* 2. Featured Collections Grid */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
