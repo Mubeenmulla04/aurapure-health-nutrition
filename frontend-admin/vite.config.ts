@@ -12,5 +12,13 @@ export default defineConfig({
   server: {
     port: 3001,
     host: true,
+    allowedHosts: ['.trycloudflare.com'],
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
 });

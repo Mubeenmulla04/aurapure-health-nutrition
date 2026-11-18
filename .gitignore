@@ -38,3 +38,7 @@ Thumbs.db
 uploads
 temp
 *.pdf
+
+# Portable Tools
+cloudflared.exe
+
